@@ -10,8 +10,8 @@
 /* Graficos */
 #include "grafico.h"
 
-#define RES_WIDTH 800
-#define RES_HEIGHT 600
+#define RES_WIDTH 900
+#define RES_HEIGHT 1600
 
 #define BOUNCER_SIZE 80
 

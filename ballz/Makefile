@@ -1,27 +1,25 @@
-PROGS = ballz
-INCDIR = .
-ALLEGRO = -lallegro_image -lallegro_primitives -lallegro_dialog -lallegro_ttf -lallegro_font -lallegro -lallegro_main
 CFLAGS = -I $(INCDIR) -std=c99 -Wall
+INCDIR = .
+EXEC_NAME = ballz
+OBJS = ballz.o grafico.o
+ALLEGRO = -lallegro_image -lallegro_primitives -lallegro_dialog -lallegro_ttf -lallegro_font -lallegro -lallegro_main
 LIBS = $(ALLEGRO)
-
 CC = gcc
 
-%.o:  %.c
-	$(CC) $(CFLAGS) -c $<
+all: $(EXEC_NAME)
 
+all debug: $(EXEC_NAME)
 debug: CFLAGS += -g -D__DEBUG__
 
-all debug: $(PROGS)
+$(EXEC_NAME): $(OBJS)
+	$(CC) $(OBJS) $(CFLAGS) $(LIBS) -o $(EXEC_NAME)
 
-$(PROGS) : % : %.o grafico.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+ballz.o: ballz.c
+grafico.o: grafico.c grafico.h
 
 clean:
-	@echo "Limpando sujeira ..."
-	@rm -f *% *.bak *~
+	rm -f *.o *.bak *~
 
 purge: clean
-	@echo "Limpando tudo ..."
-	@rm -rf core *.o
-	@rm -f $(PROGS)
+	rm -f $(EXEC_NAME)
 
