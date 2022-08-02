@@ -1,10 +1,10 @@
-     PROGS = exemplo teste-display teste-mouse teste-teclas
-     INCDIR = .
-     ALLEGRO = `pkg-config --libs allegro-5 allegro_image-5 allegro_primitives-5 allegro_dialog-5 allegro_font-5 allegro_ttf-5`
-         CFLAGS = -I $(INCDIR)
-         LIBS = $(ALLEGRO)
+PROGS = ballz
+INCDIR = .
+ALLEGRO = -lallegro_image -lallegro_primitives -lallegro_dialog -lallegro_ttf -lallegro_font -lallegro -lallegro_main
+CFLAGS = -I $(INCDIR) -std=c99 -Wall
+LIBS = $(ALLEGRO)
 
-       CC = gcc
+CC = gcc
 
 %.o:  %.c
 	$(CC) $(CFLAGS) -c $<

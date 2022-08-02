@@ -14,7 +14,6 @@
 #define RES_HEIGHT 600
 
 #define BOUNCER_SIZE 80
-#define GRID 4
 
 //-----------------------------------------------------------------------------
 
@@ -23,12 +22,11 @@ int main(int argc, char *argv[])
   Window win;
   ALLEGRO_BITMAP *image, *image1, *image2, *imageaux;
 
-  bool key[4] = { false, false, false, false },
-    redraw = true, 
-    sair = false;
+  bool redraw = true, 
+       sair = false;
   float bouncer_x, bouncer_y,
-    bouncer_dx = -GRID, 
-    bouncer_dy = GRID;
+        bouncer_dx = -4.0, 
+        bouncer_dy = 4.0;
 
   win = graphinit(RES_WIDTH, RES_HEIGHT);
 
@@ -39,8 +37,8 @@ int main(int argc, char *argv[])
   bouncer_x = win.disp_data.width / 2.0 - BOUNCER_SIZE / 2.0;
   bouncer_y = win.disp_data.height / 2.0 - BOUNCER_SIZE / 2.0;
 
-  /* Enquanto  a tecla ESC  não for  pressionada, irá executar
-     o código especificado.
+  /* Enquanto  a tecla ESC  nï¿½o for  pressionada, irï¿½ executar
+     o cï¿½digo especificado.
   */
   while (!sair) {
     ALLEGRO_EVENT ev;
@@ -50,19 +48,17 @@ int main(int argc, char *argv[])
       break;
     }
     else if(ev.type == ALLEGRO_EVENT_TIMER) {
-      /* Para mover imagem com teclas de Direção */
-      if(key[KEY_UP] && bouncer_y >= GRID)
-	bouncer_y -= GRID;
  
-      if(key[KEY_DOWN] && bouncer_y <= win.disp_data.height - BOUNCER_SIZE - GRID)
-	bouncer_y += GRID;
- 
-      if(key[KEY_LEFT] && bouncer_x >= GRID)
-	bouncer_x -= GRID;
- 
-      if(key[KEY_RIGHT] && bouncer_x <= win.disp_data.width - BOUNCER_SIZE - GRID)
-	bouncer_x += GRID;
- 
+      /* Bouncing image */
+      if(bouncer_x < 0 || bouncer_x > win.disp_data.width - BOUNCER_SIZE)
+	      bouncer_dx = -bouncer_dx;
+      
+      if(bouncer_y < 0 || bouncer_y > win.disp_data.height - BOUNCER_SIZE)
+	      bouncer_dy = -bouncer_dy;
+      
+      bouncer_x += bouncer_dx;
+      bouncer_y += bouncer_dy;
+
       redraw = true;
     }
     else if(ev.type == ALLEGRO_EVENT_MOUSE_AXES ||
@@ -76,27 +72,6 @@ int main(int argc, char *argv[])
       image = image2;
       image2 = image1;
     }
-    else if(ev.type == ALLEGRO_EVENT_KEY_DOWN) {
-      switch(ev.keyboard.keycode) {
-      case ALLEGRO_KEY_UP:    key[KEY_UP] = true;  break;
-      case ALLEGRO_KEY_DOWN:  key[KEY_DOWN] = true; break;
-      case ALLEGRO_KEY_LEFT:  key[KEY_LEFT] = true; break;
-      case ALLEGRO_KEY_RIGHT: key[KEY_RIGHT] = true; break;
-      case ALLEGRO_KEY_ENTER: image1 = image;
-	image = image2;
-	image2 = image1;
-	break;
-      }
-    }
-    else if(ev.type == ALLEGRO_EVENT_KEY_UP) {
-      switch(ev.keyboard.keycode) {
-      case ALLEGRO_KEY_UP:     key[KEY_UP] = false; break;
-      case ALLEGRO_KEY_DOWN:   key[KEY_DOWN] = false; break;
-      case ALLEGRO_KEY_LEFT:   key[KEY_LEFT] = false; break;
-      case ALLEGRO_KEY_RIGHT:  key[KEY_RIGHT] = false; break;
-      case ALLEGRO_KEY_ESCAPE: sair = true; break;
-      }
-    }
 
     if(redraw && al_is_event_queue_empty(win.event_queue)) {
       redraw = false;
@@ -104,7 +79,7 @@ int main(int argc, char *argv[])
       al_draw_bitmap(image, bouncer_x, bouncer_y, 0);
       al_flip_display();
     }
-  }
+}
 
   al_destroy_bitmap(image);
 
