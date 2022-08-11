@@ -52,33 +52,37 @@ struct game {
 
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 
-enum {MENU, SHOOTING, WATCHING, GAMEOVER} state;
+enum {MENU, WAITING, AIMING, SHOOTING, GAMEOVER} state;
 
 void draw_menu() {
 	al_clear_to_color(PRETO);
 	al_flip_display();
 }
 
-void draw_aim(Window *win, bouncer_t *bouncer, square_t *square, ALLEGRO_MOUSE_EVENT *mouse_down, ALLEGRO_MOUSE_EVENT *mouse_pos) {
+void draw_aim(Window *win, bouncer_t *bouncer, square_t *square, float distX, float distY, float dist) {
 	if(al_is_event_queue_empty(win->event_queue)) {
 		al_clear_to_color(PRETO);
 		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_SIZE, BRANCO);
 		al_draw_filled_rectangle(10, 10, 100, 100, CINZA);
 
-		float distX = MOUSE_SENSIBILITY * (mouse_pos->x - mouse_down->x);
-		float distY = MOUSE_SENSIBILITY * (mouse_pos->y - mouse_down->y);
-		float dist = sqrt(pow(distX, 2) + pow(distY, 2));
-		float mult = min(win->disp_data.height * 0.25 + dist, win->disp_data.height * 0.7);
+		float size = min(win->disp_data.height * 0.33 + dist, win->disp_data.height * 0.7);
+		float spacing = (size - 80)/16;
+		float position = size;
 
-		al_draw_filled_circle(bouncer->x - mult * distX/dist, bouncer->y - mult * distY/dist, BOUNCER_SIZE * 0.7, BRANCO);
-		al_draw_filled_triangle(bouncer->x - (BOUNCER_SIZE + 70) * distX/dist, 
-								bouncer->y - (BOUNCER_SIZE + 70) * distY/dist,
+		int i;
+		for(i = 0; i < 16; i++) {
+			al_draw_filled_circle(bouncer->x + position * distX/dist, bouncer->y + position * distY/dist, BOUNCER_SIZE * 0.6 * size/(win->disp_data.height * 0.7), BRANCO);
+			position -= spacing;
+		}
 
-								bouncer->x - (BOUNCER_SIZE + 5) * distX/dist + 7 * distY/dist, 
-								bouncer->y - (BOUNCER_SIZE + 5) * distY/dist - 7 * distX/dist, 
+		al_draw_filled_triangle(bouncer->x + (BOUNCER_SIZE + 70) * distX/dist, 
+								bouncer->y + (BOUNCER_SIZE + 70) * distY/dist,
 
-								bouncer->x - (BOUNCER_SIZE + 5) * distX/dist - 7 * distY/dist, 
-								bouncer->y - (BOUNCER_SIZE + 5) * distY/dist + 7 * distX/dist, BRANCO);
+								bouncer->x + (BOUNCER_SIZE + 5) * distX/dist + 7 * distY/dist, 
+								bouncer->y + (BOUNCER_SIZE + 5) * distY/dist - 7 * distX/dist, 
+
+								bouncer->x + (BOUNCER_SIZE + 5) * distX/dist - 7 * distY/dist, 
+								bouncer->y + (BOUNCER_SIZE + 5) * distY/dist + 7 * distX/dist, BRANCO);
 		al_flip_display();
 		
 	}
@@ -98,10 +102,10 @@ int main(int argc, char *argv[]) {
 
 	state = MENU;
 
-	bool holding = false;
-	bool menuDrew = false;
-
 	bool sair = false;
+	bool menuDrew = false;
+	bool can_shoot = false;
+
 
 	ALLEGRO_MOUSE_EVENT mouse_down;
 	bouncer_t *bouncer = malloc(sizeof(bouncer_t));
@@ -113,9 +117,14 @@ int main(int argc, char *argv[]) {
 	bouncer->x = win.disp_data.width / 2.0 - BOUNCER_SIZE / 2.0;
 	bouncer->y = shooting_y;
 
+
 	while (!sair) {
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(win.event_queue, &ev);
+
+		int distX;
+		int distY;
+		float dist;
 
 		switch (state) {
 		case MENU:
@@ -124,40 +133,44 @@ int main(int argc, char *argv[]) {
 				menuDrew = true;	
 			}
 			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-				state = SHOOTING;
+				state = WAITING;
 				draw_shoot(&win, bouncer, NULL);
+			}
+			break;
+
+		case WAITING:
+			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
+				mouse_down = ev.mouse;
+				
+				state = AIMING;
+			} 
+			break;
+		
+		case AIMING:
+			distX = MOUSE_SENSIBILITY * (mouse_down.x - ev.mouse.x);
+			distY = MOUSE_SENSIBILITY * (mouse_down.y - ev.mouse.y);
+			dist = sqrt(pow(distX, 2) + pow(distY, 2));
+
+			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
+				if (can_shoot) {
+					bouncer->dx = SPEED_FACTOR * (distX)/dist;
+					bouncer->dy = SPEED_FACTOR * (distY)/dist;
+					state = SHOOTING;
+				} else {
+					state = WAITING;
+				}
+			} else if (ev.type == ALLEGRO_EVENT_MOUSE_AXES) {
+				if((dist > BOUNCER_SIZE) && (fabs((float) distY/distX) > 0.06) && (distY < 0)) {
+					draw_aim(&win, bouncer, NULL, distX, distY, dist);
+					can_shoot = true;
+				} else {
+					draw_shoot(&win, bouncer, NULL);
+					can_shoot = false;
+				}
 			}
 			break;
 
 		case SHOOTING:
-			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-				mouse_down = ev.mouse;
-				holding = true;
-			} else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-				holding = false;
-				draw_shoot(&win, bouncer, NULL);
-				int distX = mouse_down.x - ev.mouse.x;
-				int distY = mouse_down.y - ev.mouse.y;
-				float dist = sqrt(pow(distX, 2) + pow(distY, 2));
-				if((dist > BOUNCER_SIZE) && (fabs((float) distY/distX) > 0.1) && (distY < 0))  {
-					bouncer->dx = SPEED_FACTOR * (distX)/dist;
-					bouncer->dy = SPEED_FACTOR * (distY)/dist;
-					state = WATCHING;
-				}
-			} else if (ev.type == ALLEGRO_EVENT_MOUSE_AXES && holding) {
-				int distX = MOUSE_SENSIBILITY * (mouse_down.x - ev.mouse.x);
-				int distY = MOUSE_SENSIBILITY * (mouse_down.y - ev.mouse.y);
-				float dist = sqrt(pow(distX, 2) + pow(distY, 2));
-				if((dist > BOUNCER_SIZE) && (fabs((float) distY/distX) > 0.1) && (distY < 0)) {
-					draw_aim(&win, bouncer, NULL, &mouse_down, &ev.mouse);
-				} else {
-					draw_shoot(&win, bouncer, NULL);
-				}
-			}
-			break;
-
-
-		case WATCHING:
 			if (ev.type == ALLEGRO_EVENT_TIMER) {
 				if (bouncer->x < 0 + BOUNCER_SIZE || bouncer->x > win.disp_data.width - BOUNCER_SIZE) {
 					bouncer->dx = -bouncer->dx;
@@ -168,7 +181,7 @@ int main(int argc, char *argv[]) {
 				}
 				
 				if ((bouncer->dy > 0) && (bouncer->y > shooting_y - BOUNCER_SIZE)) {
-					state = SHOOTING;
+					state = WAITING;
 					bouncer->dx = 0;
 					bouncer->dy = 0;
 				}
