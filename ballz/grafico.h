@@ -13,30 +13,20 @@ typedef struct {
 #define PIXEL(r,g,b) (al_map_rgb((unsigned char) r, (unsigned char) g, (unsigned char) b))
 #define BPIXEL(pixel) PIXEL(pixel.R, pixel.G, pixel.B)
 
-enum TECLAS_DIR { KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT };
-
 typedef struct {
   ALLEGRO_EVENT_QUEUE *event_queue;
   ALLEGRO_TIMER *timer;
   ALLEGRO_DISPLAY *display;
   ALLEGRO_DISPLAY_MODE disp_data;
-} Window;
+} window;
 
 /* Inicia sistema grafico Allegro 5.0 */
-Window graphinit(int res_width, int res_height);
+window graphinit(int res_width, int res_height);
 
 /* Finaliza sistema grafico Allegro 5.0 */
-void graphdeinit(Window win);
+void graphdeinit(window win);
 
-/* Cria região em display para exibir imagem em ambiente ALLEGRO a partir de arquivo */
-ALLEGRO_BITMAP *imagemArq(char *nomeArqImg, int width, int height, Window win);
-
-/* Cria região em display para exibir Texto em ambiente ALLEGRO */
-ALLEGRO_BITMAP *imagemTexto(char *texto, int *width, int *height, Window win);
-
-/* Lista de cores 
-   Fonte: http://pt.wikipedia.org/wiki/Anexo:Lista_de_cores
-*/
+/* Lista de cores */
 #define ACAFRAO                   PIXEL(244,196,48)
 #define AGUA_MARINHA              PIXEL(127,255,212)
 #define AGUA_MARINHA_MEDIA        PIXEL(102,205,170)

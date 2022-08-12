@@ -9,10 +9,10 @@
 
 #include "grafico.h"
 
-Window graphinit(int res_width, int res_height)
+window graphinit(int res_width, int res_height)
 {
 	int depth, res, i;
-	Window win = {NULL, NULL, NULL, {0, 0, 0, 0}};
+	window win = {NULL, NULL, NULL, {0, 0, 0, 0}};
 
 	/* Inicializa a Allegro */
 	al_init();
@@ -49,8 +49,8 @@ Window graphinit(int res_width, int res_height)
 												// ALLEGRO_FULLSCREEN
 												// ALLEGRO_FRAMELESS
 	win.display = al_create_display(600,800/*win.disp_data.width, win.disp_data.height*/);
-	win.disp_data.width = 600;
-	win.disp_data.height = 800;
+	win.disp_data.width = 600; //HARDCODED
+	win.disp_data.height = 800;//HARDCODED
 
 	/* Instala o handler de mouse do Allegro */
 	al_install_mouse();
@@ -74,57 +74,10 @@ Window graphinit(int res_width, int res_height)
 	return (win);
 }
 
-void graphdeinit(Window win)
+void graphdeinit(window win)
 {
 	al_destroy_timer(win.timer);
 	al_destroy_event_queue(win.event_queue);
 	al_destroy_display(win.display);
 }
 
-ALLEGRO_BITMAP *imagemArq(char *nomeArqImg, int width, int height, Window win)
-{
-	ALLEGRO_BITMAP *bmp, *img;
-
-	bmp = al_create_bitmap(width, height);
-	al_set_target_bitmap(bmp);
-	al_clear_to_color(NEVE);
-
-	if (nomeArqImg)
-	{
-		img = al_load_bitmap(nomeArqImg);
-		al_draw_bitmap(img, 0, 0, 0);
-	}
-
-	al_set_target_bitmap(al_get_backbuffer(win.display));
-
-	return bmp;
-}
-
-/* Cria regi�o em display para exibir Texto em ambiente ALLEGRO */
-/* */
-ALLEGRO_BITMAP *imagemTexto(char *texto, int *width, int *height, Window win)
-{
-	ALLEGRO_BITMAP *bmp, *img;
-	ALLEGRO_FONT *font;
-
-	font = al_load_ttf_font("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 24, 0);
-	*width = al_get_text_width(font, texto) + 50;
-	*height = al_get_font_line_height(font) + 50;
-
-	bmp = al_create_bitmap(*width, *height);
-
-	al_set_target_bitmap(bmp);
-	al_clear_to_color(SALMAO);
-
-	if (!font)
-	{
-		printf("\nErro na fonte de texto\n");
-		exit(1);
-	}
-
-	al_draw_text(font, AZUL, *width / 2.0, *height / 2.0, ALLEGRO_ALIGN_CENTRE, texto);
-
-	al_set_target_bitmap(al_get_backbuffer(win.display));
-
-	return bmp;
-}

@@ -7,6 +7,8 @@
 #include <allegro5/allegro.h>
 #include "allegro5/allegro_primitives.h"
 #include "allegro5/allegro_native_dialog.h"
+#include "allegro5/allegro_font.h"
+#include "allegro5/allegro_ttf.h"
 
 /* Graficos */
 #include "grafico.h"
@@ -54,12 +56,23 @@ struct game {
 
 enum {MENU, WAITING, AIMING, SHOOTING, GAMEOVER} state;
 
-void draw_menu() {
+void draw_menu(window *win) {
 	al_clear_to_color(PRETO);
+
+	char *path = al_get_current_directory();
+	strcat(path, "/dimitri/dimitri.ttf");
+	ALLEGRO_FONT *font = al_load_ttf_font(path, 100, 0);
+
+	al_draw_text(font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.2, ALLEGRO_ALIGN_CENTRE, "BALLz");
+	
+	// ALLEGRO_BITMAP *button = al_load_bitmap("button.png");
+	
+	// al_draw_bitmap(button, (win->disp_data.width - al_get_bitmap_width(button)) * 0.5 , win->disp_data.height * 0.6, 0);
+
 	al_flip_display();
 }
 
-void draw_aim(Window *win, bouncer_t *bouncer, square_t *square, float distX, float distY, float dist) {
+void draw_aim(window *win, bouncer_t *bouncer, square_t *square, float distX, float distY, float dist) {
 	if(al_is_event_queue_empty(win->event_queue)) {
 		al_clear_to_color(PRETO);
 		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_SIZE, BRANCO);
@@ -88,7 +101,7 @@ void draw_aim(Window *win, bouncer_t *bouncer, square_t *square, float distX, fl
 	}
 }
 
-void draw_shoot(Window *win, bouncer_t *bouncer, square_t *square) {
+void draw_shoot(window *win, bouncer_t *bouncer, square_t *square) {
 	if(al_is_event_queue_empty(win->event_queue)) {
 		al_clear_to_color(PRETO);
 		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_SIZE, BRANCO);
@@ -98,7 +111,7 @@ void draw_shoot(Window *win, bouncer_t *bouncer, square_t *square) {
 }
 
 int main(int argc, char *argv[]) {
-	Window win;
+	window win;
 
 	state = MENU;
 
@@ -129,7 +142,7 @@ int main(int argc, char *argv[]) {
 		switch (state) {
 		case MENU:
 			if (!menuDrew) {
-				draw_menu();
+				draw_menu(&win);
 				menuDrew = true;	
 			}
 			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
