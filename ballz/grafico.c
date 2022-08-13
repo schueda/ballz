@@ -74,8 +74,7 @@ window graphinit(int res_width, int res_height)
 	return (win);
 }
 
-void graphdeinit(window win)
-{
+void graphdeinit(window win) {
 	al_destroy_timer(win.timer);
 	al_destroy_event_queue(win.event_queue);
 	al_destroy_display(win.display);

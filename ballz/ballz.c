@@ -61,13 +61,18 @@ void draw_menu(window *win) {
 
 	char *path = al_get_current_directory();
 	strcat(path, "/dimitri/dimitri.ttf");
-	ALLEGRO_FONT *font = al_load_ttf_font(path, 100, 0);
+	// ALLEGRO_FONT *font = al_load_ttf_font(path, 100, 0);
+	// printf("%p", font);
+	// fflush(stdout);
 
-	al_draw_text(font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.2, ALLEGRO_ALIGN_CENTRE, "BALLz");
+	// al_draw_text(font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.2, ALLEGRO_ALIGN_CENTRE, "BALLz");
 	
 	// ALLEGRO_BITMAP *button = al_load_bitmap("button.png");
+	// al_draw_bitmap(button, (win->disp_data.width - al_get_bitmap_width(button)) * 0.5, win->disp_data.height * 0.6, 0);
 	
-	// al_draw_bitmap(button, (win->disp_data.width - al_get_bitmap_width(button)) * 0.5 , win->disp_data.height * 0.6, 0);
+	// free(path);
+	// free(font);
+	// free(button);
 
 	al_flip_display();
 }
@@ -77,6 +82,7 @@ void draw_aim(window *win, bouncer_t *bouncer, square_t *square, float distX, fl
 		al_clear_to_color(PRETO);
 		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_SIZE, BRANCO);
 		al_draw_filled_rectangle(10, 10, 100, 100, CINZA);
+		al_draw_filled_rectangle(0, win->disp_data.height * 0.8 + BOUNCER_SIZE, win->disp_data.width, win->disp_data.height, CINZA_ESCURO);
 
 		float size = min(win->disp_data.height * 0.33 + dist, win->disp_data.height * 0.7);
 		float spacing = (size - 80)/16;
@@ -106,6 +112,7 @@ void draw_shoot(window *win, bouncer_t *bouncer, square_t *square) {
 		al_clear_to_color(PRETO);
 		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_SIZE, BRANCO);
 		al_draw_filled_rectangle(10, 10, 100, 100, CINZA);
+al_draw_filled_rectangle(0, win->disp_data.height * 0.8 + BOUNCER_SIZE, win->disp_data.width, win->disp_data.height, CINZA_ESCURO);
 		al_flip_display();
 	}
 }
@@ -185,15 +192,15 @@ int main(int argc, char *argv[]) {
 
 		case SHOOTING:
 			if (ev.type == ALLEGRO_EVENT_TIMER) {
-				if (bouncer->x < 0 + BOUNCER_SIZE || bouncer->x > win.disp_data.width - BOUNCER_SIZE) {
+				if (bouncer->x <= 0 + BOUNCER_SIZE || bouncer->x >= win.disp_data.width - BOUNCER_SIZE) {
 					bouncer->dx = -bouncer->dx;
 				}
 
-				if (bouncer->y < 0 + BOUNCER_SIZE) {
+				if (bouncer->y <= 0 + BOUNCER_SIZE) {
 					bouncer->dy = -bouncer->dy;
 				}
 				
-				if ((bouncer->dy > 0) && (bouncer->y > shooting_y - BOUNCER_SIZE)) {
+				if ((bouncer->dy >= 0) && (bouncer->y >= shooting_y)) {
 					state = WAITING;
 					bouncer->dx = 0;
 					bouncer->dy = 0;

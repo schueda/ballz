@@ -103,7 +103,7 @@ void graphdeinit(window win);
 #define CINZA_ARDOSIA_CLARO       PIXEL(119,136,153)
 #define CINZA_ARDOSIA_ESCURO      PIXEL(47,79,79)
 #define CINZA_CLARO               PIXEL(211,211,211)
-#define CINZA_ESCURO              PIXEL(169,169,169)
+#define CINZA_ESCURO              PIXEL(30,30,30)
 #define CINZA_FOSCO               PIXEL(105,105,105)
 #define CINZA_MEDIO               PIXEL(220,220,220)
 #define COBRE                     PIXEL(184,115,51)
