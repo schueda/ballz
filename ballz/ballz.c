@@ -16,109 +16,16 @@
 #define RES_WIDTH 600
 #define RES_HEIGHT 800
 
-#define BOUNCER_SIZE 15
+#define BOUNCER_RADIUS 15
+
 #define SPEED_FACTOR 20
 
 #define MOUSE_SENSIBILITY 2
 
-typedef struct mask mask_t;
-struct mask {
-	int width;
-	int height;
-	int *bits;
-};
-
-typedef struct bouncer bouncer_t;
-struct bouncer {
-	float x;
-	float y;
-
-	float dx;
-	float dy;
-};
-
-typedef struct square square_t;
-struct square {
-	float x;
-	float y;
-
-	int hits;
-};
-
-typedef struct game game_t;
-struct game {
-	int score;
-	int balls;
-	float shooting_x;
-};
-
-#define min(x, y) (((x) < (y)) ? (x) : (y))
-
 enum {MENU, WAITING, AIMING, SHOOTING, GAMEOVER} state;
 
-void draw_menu(window *win) {
-	al_clear_to_color(PRETO);
-
-	char *path = al_get_current_directory();
-	strcat(path, "/dimitri/dimitri.ttf");
-	// ALLEGRO_FONT *font = al_load_ttf_font(path, 100, 0);
-	// printf("%p", font);
-	// fflush(stdout);
-
-	// al_draw_text(font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.2, ALLEGRO_ALIGN_CENTRE, "BALLz");
-	
-	// ALLEGRO_BITMAP *button = al_load_bitmap("button.png");
-	// al_draw_bitmap(button, (win->disp_data.width - al_get_bitmap_width(button)) * 0.5, win->disp_data.height * 0.6, 0);
-	
-	// free(path);
-	// free(font);
-	// free(button);
-
-	al_flip_display();
-}
-
-void draw_aim(window *win, bouncer_t *bouncer, square_t *square, float distX, float distY, float dist) {
-	if(al_is_event_queue_empty(win->event_queue)) {
-		al_clear_to_color(PRETO);
-		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_SIZE, BRANCO);
-		al_draw_filled_rectangle(10, 10, 100, 100, CINZA);
-		al_draw_filled_rectangle(0, win->disp_data.height * 0.8 + BOUNCER_SIZE, win->disp_data.width, win->disp_data.height, CINZA_ESCURO);
-
-		float size = min(win->disp_data.height * 0.33 + dist, win->disp_data.height * 0.7);
-		float spacing = (size - 80)/16;
-		float position = size;
-
-		int i;
-		for(i = 0; i < 16; i++) {
-			al_draw_filled_circle(bouncer->x + position * distX/dist, bouncer->y + position * distY/dist, BOUNCER_SIZE * 0.6 * size/(win->disp_data.height * 0.7), BRANCO);
-			position -= spacing;
-		}
-
-		al_draw_filled_triangle(bouncer->x + (BOUNCER_SIZE + 70) * distX/dist, 
-								bouncer->y + (BOUNCER_SIZE + 70) * distY/dist,
-
-								bouncer->x + (BOUNCER_SIZE + 5) * distX/dist + 7 * distY/dist, 
-								bouncer->y + (BOUNCER_SIZE + 5) * distY/dist - 7 * distX/dist, 
-
-								bouncer->x + (BOUNCER_SIZE + 5) * distX/dist - 7 * distY/dist, 
-								bouncer->y + (BOUNCER_SIZE + 5) * distY/dist + 7 * distX/dist, BRANCO);
-		al_flip_display();
-		
-	}
-}
-
-void draw_shoot(window *win, bouncer_t *bouncer, square_t *square) {
-	if(al_is_event_queue_empty(win->event_queue)) {
-		al_clear_to_color(PRETO);
-		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_SIZE, BRANCO);
-		al_draw_filled_rectangle(10, 10, 100, 100, CINZA);
-al_draw_filled_rectangle(0, win->disp_data.height * 0.8 + BOUNCER_SIZE, win->disp_data.width, win->disp_data.height, CINZA_ESCURO);
-		al_flip_display();
-	}
-}
-
 int main(int argc, char *argv[]) {
-	window win;
+	window win = graphinit(RES_WIDTH, RES_HEIGHT);
 
 	state = MENU;
 
@@ -126,17 +33,34 @@ int main(int argc, char *argv[]) {
 	bool menuDrew = false;
 	bool can_shoot = false;
 
+	int launchInterval = 0;
+	int launchIndex = 1;
+	int arrivalCounter = 0;
+
+
+
+	game_t game = {
+		.bouncers = 20,
+		.dx = 0,
+		.dy = 0,
+		.score = 1,
+		.shooting_x = (win.disp_data.width - BOUNCER_RADIUS) / 2.0
+	};
 
 	ALLEGRO_MOUSE_EVENT mouse_down;
-	bouncer_t *bouncer = malloc(sizeof(bouncer_t));
 
-	win = graphinit(RES_WIDTH, RES_HEIGHT);
+
+	bouncer_t **bouncers;
+	bouncers = calloc(sizeof(bouncer_t) * game.bouncers, game.bouncers);
+	bouncers[0] = malloc(sizeof(bouncer_t));
 
 	float shooting_y = win.disp_data.height * 0.8;
 
-	bouncer->x = win.disp_data.width / 2.0 - BOUNCER_SIZE / 2.0;
-	bouncer->y = shooting_y;
-
+	bouncers[0]->radius = BOUNCER_RADIUS;
+	bouncers[0]->dx = 0;
+	bouncers[0]->dy = 0;
+	bouncers[0]->x = game.shooting_x;
+	bouncers[0]->y = shooting_y;
 
 	while (!sair) {
 		ALLEGRO_EVENT ev;
@@ -154,11 +78,12 @@ int main(int argc, char *argv[]) {
 			}
 			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
 				state = WAITING;
-				draw_shoot(&win, bouncer, NULL);
+				draw_wait(&win, bouncers[0]);
 			}
 			break;
 
 		case WAITING:
+
 			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
 				mouse_down = ev.mouse;
 				
@@ -173,18 +98,22 @@ int main(int argc, char *argv[]) {
 
 			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
 				if (can_shoot) {
-					bouncer->dx = SPEED_FACTOR * (distX)/dist;
-					bouncer->dy = SPEED_FACTOR * (distY)/dist;
+					game.dx = SPEED_FACTOR * (distX)/dist;
+					game.dy = SPEED_FACTOR * (distY)/dist;
+
+					bouncers[0]->dx = game.dx;
+					bouncers[0]->dy = game.dy;
+
 					state = SHOOTING;
 				} else {
 					state = WAITING;
 				}
 			} else if (ev.type == ALLEGRO_EVENT_MOUSE_AXES) {
-				if((dist > BOUNCER_SIZE) && (fabs((float) distY/distX) > 0.06) && (distY < 0)) {
-					draw_aim(&win, bouncer, NULL, distX, distY, dist);
+				if((dist > bouncers[0]->radius) && (fabs((float) distY/distX) > 0.06) && (distY < 0)) {
+					draw_aim(&win, bouncers[0], distX, distY, dist);
 					can_shoot = true;
 				} else {
-					draw_shoot(&win, bouncer, NULL);
+					draw_wait(&win, bouncers[0]);
 					can_shoot = false;
 				}
 			}
@@ -192,24 +121,53 @@ int main(int argc, char *argv[]) {
 
 		case SHOOTING:
 			if (ev.type == ALLEGRO_EVENT_TIMER) {
-				if (bouncer->x <= 0 + BOUNCER_SIZE || bouncer->x >= win.disp_data.width - BOUNCER_SIZE) {
-					bouncer->dx = -bouncer->dx;
+				launchInterval++;
+				if (launchInterval >= 5 && launchIndex < game.bouncers) {
+					launchInterval = 0;
+					bouncers[launchIndex] = malloc(sizeof(bouncer_t));
+					bouncers[launchIndex]->dx = game.dx;
+					bouncers[launchIndex]->dy = game.dy;
+					bouncers[launchIndex]->x = game.shooting_x;
+					bouncers[launchIndex]->y = shooting_y;
+					bouncers[launchIndex]->radius = BOUNCER_RADIUS;
+					launchIndex++;
 				}
 
-				if (bouncer->y <= 0 + BOUNCER_SIZE) {
-					bouncer->dy = -bouncer->dy;
-				}
-				
-				if ((bouncer->dy >= 0) && (bouncer->y >= shooting_y)) {
-					state = WAITING;
-					bouncer->dx = 0;
-					bouncer->dy = 0;
-				}
+				for (int i=0; i<game.bouncers; i++) {
+					if (bouncers[i]) {
+						if (bouncers[i]->x <= 0 + bouncers[i]->radius || bouncers[i]->x >= win.disp_data.width - bouncers[i]->radius) {
+							bouncers[i]->dx = -bouncers[i]->dx;
+						}
 
-				bouncer->x += bouncer->dx;
-				bouncer->y += bouncer->dy;
+						if (bouncers[i]->y <= 0 + bouncers[i]->radius) {
+							bouncers[i]->dy = -bouncers[i]->dy;
+						}
 
-				draw_shoot(&win, bouncer, NULL);
+						bouncers[i]->x += bouncers[i]->dx;
+						bouncers[i]->y += bouncers[i]->dy;
+						
+						if ((bouncers[i]->dy >= 0) && (bouncers[i]->y >= shooting_y)) {
+							bouncers[i]->dx = 0;
+							bouncers[i]->dy = 0;
+								
+							if (i != 0) {
+								free(bouncers[i]);
+								bouncers[i] = NULL;
+							}
+
+							if (i == game.bouncers - 1) {
+								state = WAITING;
+								// free(bouncers);
+								// bouncers = NULL;
+								launchIndex = 1;
+								game.shooting_x = bouncers[0]->x;
+							}
+							
+						}
+
+					}
+				}
+				draw_shoot(&win, bouncers, game.bouncers);
 			}
 			break;
 
@@ -224,7 +182,7 @@ int main(int argc, char *argv[]) {
 		} 
 	}
 
-	free(bouncer);
+	free(bouncers);
 	graphdeinit(win);
 	return 0;
 }

@@ -4,6 +4,9 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_native_dialog.h>
+#include <allegro5/allegro_primitives.h>
+
+#include "game_models.h"
 
 typedef struct {
   unsigned char R, G, B;
@@ -11,7 +14,6 @@ typedef struct {
 
 /* Macros de Pixels para uso no Allegro */
 #define PIXEL(r,g,b) (al_map_rgb((unsigned char) r, (unsigned char) g, (unsigned char) b))
-#define BPIXEL(pixel) PIXEL(pixel.R, pixel.G, pixel.B)
 
 typedef struct {
   ALLEGRO_EVENT_QUEUE *event_queue;
@@ -22,6 +24,13 @@ typedef struct {
 
 /* Inicia sistema grafico Allegro 5.0 */
 window graphinit(int res_width, int res_height);
+
+void draw_menu(window *win);
+void draw_wait(window *win, bouncer_t *bouncer);
+void draw_aim(window *win, bouncer_t *bouncer, float distX, float distY, float dist);
+void draw_shoot(window *win, bouncer_t **bouncer, int balls);
+
+
 
 /* Finaliza sistema grafico Allegro 5.0 */
 void graphdeinit(window win);
