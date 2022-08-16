@@ -135,32 +135,36 @@ int main(int argc, char *argv[]) {
 
 				for (int i=0; i<game.bouncers; i++) {
 					if (bouncers[i]) {
-						if (bouncers[i]->x <= 0 + bouncers[i]->radius || bouncers[i]->x >= win.disp_data.width - bouncers[i]->radius) {
+						if (bouncers[i]->x <= bouncers[i]->radius || bouncers[i]->x >= win.disp_data.width - bouncers[i]->radius) {
 							bouncers[i]->dx = -bouncers[i]->dx;
 						}
 
-						if (bouncers[i]->y <= 0 + bouncers[i]->radius) {
+						if (bouncers[i]->y <= bouncers[i]->radius) {
 							bouncers[i]->dy = -bouncers[i]->dy;
 						}
 
 						bouncers[i]->x += bouncers[i]->dx;
 						bouncers[i]->y += bouncers[i]->dy;
 						
-						if ((bouncers[i]->dy >= 0) && (bouncers[i]->y >= shooting_y)) {
+						if ((bouncers[i]->dy > 0) && (bouncers[i]->y >= shooting_y)) {
+							arrivalCounter++;
 							bouncers[i]->dx = 0;
 							bouncers[i]->dy = 0;
 								
-							if (i != 0) {
+							if (arrivalCounter == 1) {
+								bouncer_t *auxBouncer = bouncers[i];
+								bouncers[i] = bouncers[0];
+								bouncers[0] = auxBouncer;
+							} else {
 								free(bouncers[i]);
 								bouncers[i] = NULL;
 							}
 
-							if (i == game.bouncers - 1) {
+							if (arrivalCounter == game.bouncers) {
 								state = WAITING;
-								// free(bouncers);
-								// bouncers = NULL;
 								launchIndex = 1;
 								game.shooting_x = bouncers[0]->x;
+								arrivalCounter = 0;
 							}
 							
 						}
