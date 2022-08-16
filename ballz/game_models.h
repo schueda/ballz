@@ -18,8 +18,10 @@ struct bouncer {
 
 typedef struct square square_t;
 struct square {
-	float x;
-	float y;
+	float xi;
+	float yi;
+	float xf;
+	float yf;
 
 	int hits;
 };

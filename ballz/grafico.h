@@ -26,7 +26,7 @@ typedef struct {
 window graphinit(int res_width, int res_height);
 
 void draw_menu(window *win);
-void draw_wait(window *win, bouncer_t *bouncer);
+void draw_wait(window *win, bouncer_t *bouncer, int squares[][7]);
 void draw_aim(window *win, bouncer_t *bouncer, float distX, float distY, float dist);
 void draw_shoot(window *win, bouncer_t **bouncer, int balls);
 

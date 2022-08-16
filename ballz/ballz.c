@@ -16,7 +16,7 @@
 #define RES_WIDTH 600
 #define RES_HEIGHT 800
 
-#define BOUNCER_RADIUS 15
+#define BOUNCER_RADIUS 12
 
 #define SPEED_FACTOR 20
 
@@ -37,15 +37,19 @@ int main(int argc, char *argv[]) {
 	int launchIndex = 1;
 	int arrivalCounter = 0;
 
-
-
 	game_t game = {
-		.bouncers = 20,
+		.bouncers = 100,
 		.dx = 0,
 		.dy = 0,
 		.score = 1,
 		.shooting_x = (win.disp_data.width - BOUNCER_RADIUS) / 2.0
 	};
+
+	int squares[8][7];
+	int i, j;
+	for (i = 0; i < 8; ++i)
+		for (j = 1; j < 7; ++j)
+			squares[i][j] = 1;
 
 	ALLEGRO_MOUSE_EVENT mouse_down;
 
@@ -54,7 +58,7 @@ int main(int argc, char *argv[]) {
 	bouncers = calloc(sizeof(bouncer_t) * game.bouncers, game.bouncers);
 	bouncers[0] = malloc(sizeof(bouncer_t));
 
-	float shooting_y = win.disp_data.height * 0.8;
+	float shooting_y = 8.8 * (win.disp_data.width)/7.8 - BOUNCER_RADIUS;
 
 	bouncers[0]->radius = BOUNCER_RADIUS;
 	bouncers[0]->dx = 0;
@@ -78,7 +82,7 @@ int main(int argc, char *argv[]) {
 			}
 			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
 				state = WAITING;
-				draw_wait(&win, bouncers[0]);
+				draw_wait(&win, bouncers[0], squares);
 			}
 			break;
 
@@ -105,6 +109,7 @@ int main(int argc, char *argv[]) {
 					bouncers[0]->dy = game.dy;
 
 					state = SHOOTING;
+					can_shoot = false;
 				} else {
 					state = WAITING;
 				}
@@ -113,7 +118,7 @@ int main(int argc, char *argv[]) {
 					draw_aim(&win, bouncers[0], distX, distY, dist);
 					can_shoot = true;
 				} else {
-					draw_wait(&win, bouncers[0]);
+					draw_wait(&win, bouncers[0], squares);
 					can_shoot = false;
 				}
 			}

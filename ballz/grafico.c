@@ -84,11 +84,28 @@ void draw_menu(window *win) {
 	// al_flip_display();
 }
 
-void draw_wait(window *win, bouncer_t *bouncer) {
+void draw_squares(window *win, int squares[][7]) {
+	float l = win->disp_data.width / 7.8;
+	int i, j;
+	for (i = 0; i < 8; ++i) {
+		for (j = 0; j < 7; ++j) {
+			if (squares[i][j] == 1) {
+				al_draw_filled_rectangle(i * 1.1*l + 0.1*l, j * 1.1*l, (i+1) * 1.1*l, j * 1.1*l + l, VERMELHO);
+			}
+		}
+	}
+}
+
+void draw_ground(window *win, bouncer_t *bouncer) {
+	al_draw_filled_rectangle(0, 8.8 * (win->disp_data.width)/7.8, win->disp_data.width, win->disp_data.height, CINZA_ESCURO);
+}
+
+void draw_wait(window *win, bouncer_t *bouncer, int squares[][7]) {
 	if(al_event_queue_is_empty(win->event_queue)) {
 		al_clear_to_color(PRETO);
 		al_draw_filled_circle(bouncer->x, bouncer->y, bouncer->radius, BRANCO);
-		al_draw_filled_rectangle(0, win->disp_data.height * 0.8 + bouncer->radius, win->disp_data.width, win->disp_data.height, CINZA_ESCURO);
+		draw_ground(win, bouncer);
+		draw_squares(win, squares);
 		al_flip_display();
 	}
 }
@@ -97,7 +114,7 @@ void draw_aim(window *win, bouncer_t *bouncer, float distX, float distY, float d
 	if(al_is_event_queue_empty(win->event_queue)) {
 		al_clear_to_color(PRETO);
 		al_draw_filled_circle(bouncer->x, bouncer->y, bouncer->radius, BRANCO);
-		al_draw_filled_rectangle(0, win->disp_data.height * 0.8 + bouncer->radius, win->disp_data.width, win->disp_data.height, CINZA_ESCURO);
+		draw_ground(win, bouncer);
 
 		float size = min(win->disp_data.height * 0.33 + dist, win->disp_data.height * 0.7);
 		float spacing = (size - 80)/16;
@@ -129,7 +146,7 @@ void draw_shoot(window *win, bouncer_t **bouncers, int bouncersCount) {
 				al_draw_filled_circle(bouncers[i]->x, bouncers[i]->y, bouncers[i]->radius, BRANCO);
 			}
 		}
-		// al_draw_filled_rectangle(0, win->disp_data.height * 0.8 + bouncers[0]->radius, win->disp_data.width, win->disp_data.height, CINZA_ESCURO);
+		draw_ground(win, bouncers[0]);
 		al_flip_display();
 	}
 }
