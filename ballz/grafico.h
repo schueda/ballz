@@ -6,7 +6,7 @@
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_primitives.h>
 
-#include "game_models.h"
+#include "game_helpers.h"
 
 typedef struct {
   unsigned char R, G, B;
@@ -26,9 +26,9 @@ typedef struct {
 window graphinit(int res_width, int res_height);
 
 void draw_menu(window *win);
-void draw_wait(window *win, bouncer_t *bouncer, int squares[][7]);
-void draw_aim(window *win, bouncer_t *bouncer, float distX, float distY, float dist);
-void draw_shoot(window *win, bouncer_t **bouncer, int balls);
+void draw_wait(window *win, bouncer_t *bouncer, int squares[][COLUNAS_QUADRADO]);
+void draw_aim(window *win, bouncer_t *bouncer, float distX, float distY, float dist, int squares[][COLUNAS_QUADRADO]);
+void draw_shoot(window *win, bouncer_t **bouncer, int balls, int squares[][COLUNAS_QUADRADO]);
 
 
 

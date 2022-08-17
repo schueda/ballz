@@ -16,12 +16,6 @@
 #define RES_WIDTH 600
 #define RES_HEIGHT 800
 
-#define BOUNCER_RADIUS 12
-
-#define SPEED_FACTOR 20
-
-#define MOUSE_SENSIBILITY 2
-
 enum {MENU, WAITING, AIMING, SHOOTING, GAMEOVER} state;
 
 int main(int argc, char *argv[]) {
@@ -38,17 +32,17 @@ int main(int argc, char *argv[]) {
 	int arrivalCounter = 0;
 
 	game_t game = {
-		.bouncers = 100,
+		.bouncers = 10,
 		.dx = 0,
 		.dy = 0,
 		.score = 1,
 		.shooting_x = (win.disp_data.width - BOUNCER_RADIUS) / 2.0
 	};
 
-	int squares[8][7];
+	int squares[LINHAS_QUADRADO][COLUNAS_QUADRADO];
 	int i, j;
-	for (i = 0; i < 8; ++i)
-		for (j = 1; j < 7; ++j)
+	for (i = 0; i < LINHAS_QUADRADO; ++i)
+		for (j = 1; j < COLUNAS_QUADRADO; ++j)
 			squares[i][j] = 1;
 
 	ALLEGRO_MOUSE_EVENT mouse_down;
@@ -58,9 +52,9 @@ int main(int argc, char *argv[]) {
 	bouncers = calloc(sizeof(bouncer_t) * game.bouncers, game.bouncers);
 	bouncers[0] = malloc(sizeof(bouncer_t));
 
-	float shooting_y = 8.8 * (win.disp_data.width)/7.8 - BOUNCER_RADIUS;
+	float squareSide = calcSquareSide(win.disp_data.width);
+	float shooting_y = calcSquareYf(7, squareSide) - BOUNCER_RADIUS;
 
-	bouncers[0]->radius = BOUNCER_RADIUS;
 	bouncers[0]->dx = 0;
 	bouncers[0]->dy = 0;
 	bouncers[0]->x = game.shooting_x;
@@ -114,8 +108,8 @@ int main(int argc, char *argv[]) {
 					state = WAITING;
 				}
 			} else if (ev.type == ALLEGRO_EVENT_MOUSE_AXES) {
-				if((dist > bouncers[0]->radius) && (fabs((float) distY/distX) > 0.06) && (distY < 0)) {
-					draw_aim(&win, bouncers[0], distX, distY, dist);
+				if((dist > BOUNCER_RADIUS) && (fabs((float) distY/distX) > 0.06) && (distY < 0)) {
+					draw_aim(&win, bouncers[0], distX, distY, dist, squares);
 					can_shoot = true;
 				} else {
 					draw_wait(&win, bouncers[0], squares);
@@ -134,22 +128,43 @@ int main(int argc, char *argv[]) {
 					bouncers[launchIndex]->dy = game.dy;
 					bouncers[launchIndex]->x = game.shooting_x;
 					bouncers[launchIndex]->y = shooting_y;
-					bouncers[launchIndex]->radius = BOUNCER_RADIUS;
 					launchIndex++;
 				}
 
+				printf("bouncer x: %f\n", bouncers[0]->x);
+				// printf("bouncer y: %f\n", bouncers[0]->y);
 				for (int i=0; i<game.bouncers; i++) {
 					if (bouncers[i]) {
-						if (bouncers[i]->x <= bouncers[i]->radius || bouncers[i]->x >= win.disp_data.width - bouncers[i]->radius) {
+						if (bouncers[i]->x <= BOUNCER_RADIUS) {
+							bouncers[i]->dx = -bouncers[i]->dx;
+						}
+							
+						if (bouncers[i]->x >= win.disp_data.width - BOUNCER_RADIUS) {
 							bouncers[i]->dx = -bouncers[i]->dx;
 						}
 
-						if (bouncers[i]->y <= bouncers[i]->radius) {
+						if (bouncers[i]->y <= BOUNCER_RADIUS) {
 							bouncers[i]->dy = -bouncers[i]->dy;
 						}
 
 						bouncers[i]->x += bouncers[i]->dx;
 						bouncers[i]->y += bouncers[i]->dy;
+
+						for (int l=0; l<LINHAS_QUADRADO; l++) {
+							if(calcSquareXi(l, squareSide) < bouncers[i]->x && calcSquareXf(l, squareSide) > bouncers[i]->x) {
+								for (int c=1; c<COLUNAS_QUADRADO; c++) {
+									if (bouncers[i]->dy > 0) {
+										if (bouncers[i]->y >= calcSquareYi(j, squareSide) + BOUNCER_RADIUS) {
+											bouncers[i]->dy = - bouncers[i]->dy;
+										}
+									} else if (bouncers[i]->dy < 0) {
+										if (bouncers[i]->y <= calcSquareYf(j, squareSide) - BOUNCER_RADIUS) {
+											bouncers[i]->dy = - bouncers[i]->dy;
+										}
+									}
+								}
+							}
+						}
 						
 						if ((bouncers[i]->dy > 0) && (bouncers[i]->y >= shooting_y)) {
 							arrivalCounter++;
@@ -176,7 +191,7 @@ int main(int argc, char *argv[]) {
 
 					}
 				}
-				draw_shoot(&win, bouncers, game.bouncers);
+				draw_shoot(&win, bouncers, game.bouncers, squares);
 			}
 			break;
 

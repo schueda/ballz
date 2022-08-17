@@ -85,35 +85,36 @@ void draw_menu(window *win) {
 }
 
 void draw_squares(window *win, int squares[][7]) {
-	float l = win->disp_data.width / 7.8;
+	float l = calcSquareSide(win->disp_data.width);
 	int i, j;
-	for (i = 0; i < 8; ++i) {
-		for (j = 0; j < 7; ++j) {
+	for (i = 0; i < LINHAS_QUADRADO; ++i) {
+		for (j = 0; j < COLUNAS_QUADRADO; ++j) {
 			if (squares[i][j] == 1) {
-				al_draw_filled_rectangle(i * 1.1*l + 0.1*l, j * 1.1*l, (i+1) * 1.1*l, j * 1.1*l + l, VERMELHO);
+				al_draw_filled_rectangle(calcSquareXi(i, l), calcSquareYi(j, l), calcSquareXf(i, l), calcSquareYf(j, l), VERMELHO);
 			}
 		}
 	}
 }
 
 void draw_ground(window *win, bouncer_t *bouncer) {
-	al_draw_filled_rectangle(0, 8.8 * (win->disp_data.width)/7.8, win->disp_data.width, win->disp_data.height, CINZA_ESCURO);
+	al_draw_filled_rectangle(0, calcSquareYf(7, calcSquareSide(win->disp_data.width)), win->disp_data.width, win->disp_data.height, CINZA_ESCURO);
 }
 
 void draw_wait(window *win, bouncer_t *bouncer, int squares[][7]) {
 	if(al_event_queue_is_empty(win->event_queue)) {
 		al_clear_to_color(PRETO);
-		al_draw_filled_circle(bouncer->x, bouncer->y, bouncer->radius, BRANCO);
+		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_RADIUS, BRANCO);
 		draw_ground(win, bouncer);
 		draw_squares(win, squares);
 		al_flip_display();
 	}
 }
 
-void draw_aim(window *win, bouncer_t *bouncer, float distX, float distY, float dist) {
+void draw_aim(window *win, bouncer_t *bouncer, float distX, float distY, float dist, int squares[][COLUNAS_QUADRADO]) {
 	if(al_is_event_queue_empty(win->event_queue)) {
 		al_clear_to_color(PRETO);
-		al_draw_filled_circle(bouncer->x, bouncer->y, bouncer->radius, BRANCO);
+		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_RADIUS, BRANCO);
+		draw_squares(win, squares);
 		draw_ground(win, bouncer);
 
 		float size = min(win->disp_data.height * 0.33 + dist, win->disp_data.height * 0.7);
@@ -122,30 +123,31 @@ void draw_aim(window *win, bouncer_t *bouncer, float distX, float distY, float d
 
 		int i;
 		for(i = 0; i < 16; i++) {
-			al_draw_filled_circle(bouncer->x + position * distX/dist, bouncer->y + position * distY/dist, bouncer->radius * 0.6 * size/(win->disp_data.height * 0.7), BRANCO);
+			al_draw_filled_circle(bouncer->x + position * distX/dist, bouncer->y + position * distY/dist, BOUNCER_RADIUS * 0.6 * size/(win->disp_data.height * 0.7), BRANCO);
 			position -= spacing;
 		}
 
-		al_draw_filled_triangle(bouncer->x + (bouncer->radius + 70) * distX/dist, 
-								bouncer->y + (bouncer->radius + 70) * distY/dist,
+		al_draw_filled_triangle(bouncer->x + (BOUNCER_RADIUS + 70) * distX/dist, 
+								bouncer->y + (BOUNCER_RADIUS + 70) * distY/dist,
 
-								bouncer->x + (bouncer->radius + 5) * distX/dist + 7 * distY/dist, 
-								bouncer->y + (bouncer->radius + 5) * distY/dist - 7 * distX/dist, 
+								bouncer->x + (BOUNCER_RADIUS + 5) * distX/dist + 7 * distY/dist, 
+								bouncer->y + (BOUNCER_RADIUS + 5) * distY/dist - 7 * distX/dist, 
 
-								bouncer->x + (bouncer->radius + 5) * distX/dist - 7 * distY/dist, 
-								bouncer->y + (bouncer->radius + 5) * distY/dist + 7 * distX/dist, BRANCO);
+								bouncer->x + (BOUNCER_RADIUS + 5) * distX/dist - 7 * distY/dist, 
+								bouncer->y + (BOUNCER_RADIUS + 5) * distY/dist + 7 * distX/dist, BRANCO);
 		al_flip_display();
 	}
 }
 
-void draw_shoot(window *win, bouncer_t **bouncers, int bouncersCount) {
+void draw_shoot(window *win, bouncer_t **bouncers, int bouncersCount, int squares[][COLUNAS_QUADRADO]) {
 	if(al_is_event_queue_empty(win->event_queue)) {
 		al_clear_to_color(PRETO);
 		for(int i=0; i<bouncersCount; i++) {
 			if (bouncers[i]) {
-				al_draw_filled_circle(bouncers[i]->x, bouncers[i]->y, bouncers[i]->radius, BRANCO);
+				al_draw_filled_circle(bouncers[i]->x, bouncers[i]->y, BOUNCER_RADIUS, BRANCO);
 			}
 		}
+		draw_squares(win, squares);
 		draw_ground(win, bouncers[0]);
 		al_flip_display();
 	}
