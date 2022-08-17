@@ -32,18 +32,23 @@ int main(int argc, char *argv[]) {
 	int arrivalCounter = 0;
 
 	game_t game = {
-		.bouncers = 10,
+		.bouncers = 20,
 		.dx = 0,
 		.dy = 0,
 		.score = 1,
 		.shooting_x = (win.disp_data.width - BOUNCER_RADIUS) / 2.0
 	};
 
-	int squares[LINHAS_QUADRADO][COLUNAS_QUADRADO];
+	int squares[LINHAS_QUADRADO][COLUNAS_QUADRADO] = {
+		{0, 0, 0, 0, 0, 0, 0},
+		{1, 10, 10, 10, 10, 10, 10},
+		{1, 10, 10, 10, 10, 10, 10},
+		{1, 10, 10, 10, 10, 10, 10},
+		{1, 10, 10, 10, 10, 10, 10},
+		{1, 10, 10, 10, 10, 10, 10},
+		{1, 10, 10, 10, 10, 10, 10},
+	};
 	int i, j;
-	for (i = 0; i < LINHAS_QUADRADO; ++i)
-		for (j = 1; j < COLUNAS_QUADRADO; ++j)
-			squares[i][j] = 1;
 
 	ALLEGRO_MOUSE_EVENT mouse_down;
 
@@ -133,7 +138,7 @@ int main(int argc, char *argv[]) {
 
 				printf("bouncer x: %f\n", bouncers[0]->x);
 				// printf("bouncer y: %f\n", bouncers[0]->y);
-				for (int i=0; i<game.bouncers; i++) {
+				for (i=0; i<game.bouncers; i++) {
 					if (bouncers[i]) {
 						if (bouncers[i]->x <= BOUNCER_RADIUS) {
 							bouncers[i]->dx = -bouncers[i]->dx;
@@ -147,24 +152,31 @@ int main(int argc, char *argv[]) {
 							bouncers[i]->dy = -bouncers[i]->dy;
 						}
 
-						bouncers[i]->x += bouncers[i]->dx;
-						bouncers[i]->y += bouncers[i]->dy;
 
 						for (int l=0; l<LINHAS_QUADRADO; l++) {
-							if(calcSquareXi(l, squareSide) < bouncers[i]->x && calcSquareXf(l, squareSide) > bouncers[i]->x) {
+							if(calcSquareXi(l, squareSide) <= bouncers[i]->x && calcSquareXf(l, squareSide) >= bouncers[i]->x) {
 								for (int c=1; c<COLUNAS_QUADRADO; c++) {
-									if (bouncers[i]->dy > 0) {
-										if (bouncers[i]->y >= calcSquareYi(j, squareSide) + BOUNCER_RADIUS) {
-											bouncers[i]->dy = - bouncers[i]->dy;
-										}
-									} else if (bouncers[i]->dy < 0) {
-										if (bouncers[i]->y <= calcSquareYf(j, squareSide) - BOUNCER_RADIUS) {
-											bouncers[i]->dy = - bouncers[i]->dy;
-										}
+									if (squares[l][c] > 0 && calcSquareYi(c, squareSide) <= bouncers[i]->y + BOUNCER_RADIUS && calcSquareYf(c, squareSide) >= bouncers[i]->y - BOUNCER_RADIUS) {
+										bouncers[i]->dy = -bouncers[i]->dy;
+										squares[l][c]--;
 									}
 								}
 							}
 						}
+
+						for (int c=0; c<COLUNAS_QUADRADO; c++) {
+							if(calcSquareYi(c, squareSide) <= bouncers[i]->y && calcSquareYf(c, squareSide) >= bouncers[i]->y) {
+								for (int l=1; l<LINHAS_QUADRADO; l++) {
+									if (squares[l][c] > 0 && calcSquareXi(l, squareSide) <= bouncers[i]->x + BOUNCER_RADIUS && calcSquareXf(l, squareSide) >= bouncers[i]->x - BOUNCER_RADIUS) {
+										bouncers[i]->dx = -bouncers[i]->dx;
+										squares[l][c]--;
+									}
+								}
+							}
+						}
+						
+						bouncers[i]->x += bouncers[i]->dx;
+						bouncers[i]->y += bouncers[i]->dy;
 						
 						if ((bouncers[i]->dy > 0) && (bouncers[i]->y >= shooting_y)) {
 							arrivalCounter++;

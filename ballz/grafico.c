@@ -89,8 +89,8 @@ void draw_squares(window *win, int squares[][7]) {
 	int i, j;
 	for (i = 0; i < LINHAS_QUADRADO; ++i) {
 		for (j = 0; j < COLUNAS_QUADRADO; ++j) {
-			if (squares[i][j] == 1) {
-				al_draw_filled_rectangle(calcSquareXi(i, l), calcSquareYi(j, l), calcSquareXf(i, l), calcSquareYf(j, l), VERMELHO);
+			if (squares[i][j] > 0) {
+				al_draw_filled_rectangle(calcSquareXi(i, l), calcSquareYi(j, l), calcSquareXf(i, l), calcSquareYf(j, l), al_map_rgb(255-squares[i][j], squares[i][j], 128));
 			}
 		}
 	}
