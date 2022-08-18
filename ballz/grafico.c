@@ -84,13 +84,13 @@ void draw_menu(window *win) {
 	// al_flip_display();
 }
 
-void draw_squares(window *win, int squares[][7]) {
+void draw_squares(window *win, int squares[][7], float offsetY) {
 	float l = calcSquareSide(win->disp_data.width);
 	int i, j;
 	for (i = 0; i < LINHAS_QUADRADO; ++i) {
 		for (j = 0; j < COLUNAS_QUADRADO; ++j) {
 			if (squares[i][j] > 0) {
-				al_draw_filled_rectangle(calcSquareXi(j, l), calcSquareYi(i, l), calcSquareXf(j, l), calcSquareYf(i, l), al_map_rgb(255-squares[i][j], squares[i][j], 128));
+				al_draw_filled_rectangle(calcSquareXi(j, l), calcSquareYi(i, l) + offsetY, calcSquareXf(j, l), calcSquareYf(i, l) + offsetY, al_map_rgb(255-squares[i][j], squares[i][j], 128));
 			}
 		}
 	}
@@ -105,7 +105,17 @@ void draw_wait(window *win, bouncer_t *bouncer, int squares[][7]) {
 		al_clear_to_color(PRETO);
 		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_RADIUS, BRANCO);
 		draw_ground(win, bouncer);
-		draw_squares(win, squares);
+		draw_squares(win, squares, 0);
+		al_flip_display();
+	}
+}
+
+void draw_setup(window *win, bouncer_t *bouncer, int squares[][COLUNAS_QUADRADO], float offsetY) {
+	if(al_event_queue_is_empty(win->event_queue)) {
+		al_clear_to_color(PRETO);
+		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_RADIUS, BRANCO);
+		draw_ground(win, bouncer);
+		draw_squares(win, squares, offsetY);
 		al_flip_display();
 	}
 }
@@ -114,7 +124,7 @@ void draw_aim(window *win, bouncer_t *bouncer, float distX, float distY, float d
 	if(al_is_event_queue_empty(win->event_queue)) {
 		al_clear_to_color(PRETO);
 		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_RADIUS, BRANCO);
-		draw_squares(win, squares);
+		draw_squares(win, squares, 0);
 		draw_ground(win, bouncer);
 
 		float size = min(win->disp_data.height * 0.33 + dist, win->disp_data.height * 0.7);
@@ -147,7 +157,7 @@ void draw_shoot(window *win, bouncer_t **bouncers, int bouncersCount, int square
 				al_draw_filled_circle(bouncers[i]->x, bouncers[i]->y, BOUNCER_RADIUS, BRANCO);
 			}
 		}
-		draw_squares(win, squares);
+		draw_squares(win, squares, 0);
 		draw_ground(win, bouncers[0]);
 		al_flip_display();
 	}

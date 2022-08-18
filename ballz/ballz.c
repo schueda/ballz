@@ -16,20 +16,24 @@
 #define RES_WIDTH 600
 #define RES_HEIGHT 800
 
-enum {MENU, WAITING, AIMING, SHOOTING, GAMEOVER} state;
+enum {MENU, SETUP, WAITING, AIMING, SHOOTING, GAMEOVER} state;
 
 int main(int argc, char *argv[]) {
 	window win = graphinit(RES_WIDTH, RES_HEIGHT);
+	srand(time(NULL));
 
 	state = MENU;
 
 	bool sair = false;
 	bool menuDrew = false;
-	bool can_shoot = false;
+	bool canShoot = false;
+	bool addedNewSquares = false;
 
 	int launchInterval = 0;
 	int launchIndex = 1;
 	int arrivalCounter = 0;
+	
+	float offset=0;
 
 	game_t game = {
 		.bouncers = 1,
@@ -39,17 +43,18 @@ int main(int argc, char *argv[]) {
 		.shooting_x = (win.disp_data.width - BOUNCER_RADIUS) / 2.0
 	};
 
-	int squares[LINHAS_QUADRADO][COLUNAS_QUADRADO] = {
-		{0, 0, 0, 0, 0, 0, 0},
-		{1, 1, 1, 1, 1, 1, 1},
-		{1, 1, 0, 0, 0, 0, 1},
-		{1, 0, 1, 0, 0, 0, 1},
-		{1, 0, 0, 1, 0, 0, 1},
-		{1, 0, 0, 0, 1, 0, 1},
-		{1, 0, 0, 0, 0, 1, 1},
-		{1, 1, 1, 1, 1, 1, 1}
-	};
+	int squares[LINHAS_QUADRADO][COLUNAS_QUADRADO];
+
 	int i, j;
+	for (i = 0; i < LINHAS_QUADRADO; ++i) {
+		for (j = 0; j < COLUNAS_QUADRADO; ++j) {
+			if (i == 1) {
+				squares[i][j] = rand() % 2;
+			} else {
+				squares[i][j] = 0;
+			}
+		}
+	}
 
 	ALLEGRO_MOUSE_EVENT mouse_down;
 
@@ -86,6 +91,22 @@ int main(int argc, char *argv[]) {
 			}
 			break;
 
+		case SETUP:
+			if (!addedNewSquares) {
+				for (j=0; j<COLUNAS_QUADRADO; j++) {
+					game.score++;
+					squares[0][j] = (rand() % 3) * game.score;
+				}
+			}
+			if (offset<squareSide) {
+				draw_setup(&win, bouncers[0], squares, offset);
+			 	offset++;
+			} else {
+				state = WAITING;
+				draw_wait(&win, bouncers[0], squares);
+			};
+			
+
 		case WAITING:
 
 			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
@@ -101,7 +122,7 @@ int main(int argc, char *argv[]) {
 			dist = sqrt(pow(distX, 2) + pow(distY, 2));
 
 			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-				if (can_shoot) {
+				if (canShoot) {
 					game.dx = SPEED_FACTOR * (distX)/dist;
 					game.dy = SPEED_FACTOR * (distY)/dist;
 
@@ -109,17 +130,17 @@ int main(int argc, char *argv[]) {
 					bouncers[0]->dy = game.dy;
 
 					state = SHOOTING;
-					can_shoot = false;
+					canShoot = false;
 				} else {
 					state = WAITING;
 				}
 			} else if (ev.type == ALLEGRO_EVENT_MOUSE_AXES) {
 				if((dist > BOUNCER_RADIUS) && (fabs((float) distY/distX) > 0.06) && (distY < 0)) {
 					draw_aim(&win, bouncers[0], distX, distY, dist, squares);
-					can_shoot = true;
+					canShoot = true;
 				} else {
 					draw_wait(&win, bouncers[0], squares);
-					can_shoot = false;
+					canShoot = false;
 				}
 			}
 			break;
@@ -196,7 +217,7 @@ int main(int argc, char *argv[]) {
 							}
 
 							if (arrivalCounter == game.bouncers) {
-								state = WAITING;
+								state = SETUP;
 								launchIndex = 1;
 								game.shooting_x = bouncers[0]->x;
 								arrivalCounter = 0;
