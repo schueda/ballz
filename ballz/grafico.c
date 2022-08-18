@@ -90,14 +90,14 @@ void draw_squares(window *win, int squares[][7]) {
 	for (i = 0; i < LINHAS_QUADRADO; ++i) {
 		for (j = 0; j < COLUNAS_QUADRADO; ++j) {
 			if (squares[i][j] > 0) {
-				al_draw_filled_rectangle(calcSquareXi(i, l), calcSquareYi(j, l), calcSquareXf(i, l), calcSquareYf(j, l), al_map_rgb(255-squares[i][j], squares[i][j], 128));
+				al_draw_filled_rectangle(calcSquareXi(j, l), calcSquareYi(i, l), calcSquareXf(j, l), calcSquareYf(i, l), al_map_rgb(255-squares[i][j], squares[i][j], 128));
 			}
 		}
 	}
 }
 
 void draw_ground(window *win, bouncer_t *bouncer) {
-	al_draw_filled_rectangle(0, calcSquareYf(7, calcSquareSide(win->disp_data.width)), win->disp_data.width, win->disp_data.height, CINZA_ESCURO);
+	al_draw_filled_rectangle(0, calcSquareYf(8, calcSquareSide(win->disp_data.width)), win->disp_data.width, win->disp_data.height, CINZA_ESCURO);
 }
 
 void draw_wait(window *win, bouncer_t *bouncer, int squares[][7]) {

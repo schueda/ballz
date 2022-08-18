@@ -29,7 +29,12 @@ struct game {
 
 float calcSquareSide(float dispWidth);
 
-float calcSquareXi(float i, float l);
-float calcSquareYi(float j, float l);
-float calcSquareXf(float i, float l);
-float calcSquareYf(float j, float l);
+float calcSquareXi(float j, float l);
+float calcSquareYi(float i, float l);
+float calcSquareXf(float j, float l);
+float calcSquareYf(float i, float l);
+
+int calcjMatrixPositioni(float xi, float l);
+int calciMatrixPositioni(float yi, float l);
+int calcjMatrixPositionf(float xf, float l);
+int calciMatrixPositionf(float yf, float l);
