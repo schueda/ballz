@@ -155,7 +155,9 @@ int main(int argc, char *argv[]) {
 						for (int c=0; c<COLUNAS_QUADRADO; c++) {
 							if(calcSquareXi(c, squareSide) <= bouncers[i]->x && calcSquareXf(c, squareSide) >= bouncers[i]->x) {
 								for (int l=1; l<LINHAS_QUADRADO; l++) {
-									if (squares[l][c] > 0 && calcSquareYi(l, squareSide) <= bouncers[i]->y + BOUNCER_RADIUS && calcSquareYf(l, squareSide) >= bouncers[i]->y - BOUNCER_RADIUS) {
+									if (squares[l][c] > 0
+									&& calcSquareYi(l, squareSide) <= bouncers[i]->y + BOUNCER_RADIUS
+									&& calcSquareYf(l, squareSide) >= bouncers[i]->y - BOUNCER_RADIUS) {
 										bouncers[i]->dy = -bouncers[i]->dy;
 										squares[l][c]--;
 									}
@@ -166,7 +168,9 @@ int main(int argc, char *argv[]) {
 						for (int l=0; l<LINHAS_QUADRADO; l++) {
 							if(calcSquareYi(l, squareSide) <= bouncers[i]->y && calcSquareYf(l, squareSide) >= bouncers[i]->y) {
 								for (int c=1; c<COLUNAS_QUADRADO; c++) {
-									if (squares[l][c] > 0 && calcSquareXi(c, squareSide) <= bouncers[i]->x + BOUNCER_RADIUS && calcSquareXf(c, squareSide) >= bouncers[i]->x - BOUNCER_RADIUS) {
+									if (squares[l][c] > 0
+										&& calcSquareXi(c, squareSide) <= bouncers[i]->x + BOUNCER_RADIUS 
+										&& calcSquareXf(c, squareSide) >= bouncers[i]->x - BOUNCER_RADIUS) {
 										bouncers[i]->dx = -bouncers[i]->dx;
 										squares[l][c]--;
 									}

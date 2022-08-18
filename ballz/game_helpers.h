@@ -1,6 +1,6 @@
 #define BOUNCER_RADIUS 12
 
-#define SPEED_FACTOR 20
+#define SPEED_FACTOR 10
 
 #define MOUSE_SENSIBILITY 2
 
