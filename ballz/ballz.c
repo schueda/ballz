@@ -40,13 +40,13 @@ int main(int argc, char *argv[]) {
 	};
 
 	int squares[LINHAS_QUADRADO][COLUNAS_QUADRADO] = {
-		{0, 0, 0, 0, 0, 0, 0},
 		{1, 1, 1, 1, 1, 1, 1},
-		{1, 1, 0, 0, 0, 0, 1},
-		{1, 0, 1, 0, 0, 0, 1},
-		{1, 0, 0, 1, 0, 0, 1},
-		{1, 0, 0, 0, 1, 0, 1},
-		{1, 0, 0, 0, 0, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1},
 		{1, 1, 1, 1, 1, 1, 1}
 	};
 	int i, j;
@@ -151,29 +151,105 @@ int main(int argc, char *argv[]) {
 							bouncers[i]->dy = -bouncers[i]->dy;
 						}
 
-
-						for (int c=0; c<COLUNAS_QUADRADO; c++) {
-							if(calcSquareXi(c, squareSide) <= bouncers[i]->x && calcSquareXf(c, squareSide) >= bouncers[i]->x) {
-								for (int l=1; l<LINHAS_QUADRADO; l++) {
-									if (squares[l][c] > 0 && calcSquareYi(l, squareSide) <= bouncers[i]->y + BOUNCER_RADIUS && calcSquareYf(l, squareSide) >= bouncers[i]->y - BOUNCER_RADIUS) {
+						int bouncerI = calciMatrixPositioni(bouncers[i]->y, squareSide);
+						int bouncerJ = calcjMatrixPositionf(bouncers[i]->x, squareSide);
+						if ((bouncerI > 0 && bouncerI < LINHAS_QUADRADO - 1) && (bouncerJ > 0 && bouncerJ < COLUNAS_QUADRADO)) {
+							if (bouncers[i]->dy > 0) {
+								if (bouncers[i]->dx > 0) {
+									float xi = calcSquareXi(bouncerJ + 1, squareSide);
+									float yi = calcSquareYi(bouncerI + 1, squareSide);
+									if ((xi <= bouncers[i]->x + BOUNCER_RADIUS)
+										&& (yi <= bouncers[i]->y + BOUNCER_RADIUS)) {
+										if (squares[bouncerI + 1][bouncerJ + 1] > 0) {
+											// exit(0);
+											printf("QUINOU\n");
+										}
+									} else if (xi <= bouncers[i]->x + BOUNCER_RADIUS && squares[bouncerI][bouncerJ + 1] > 0) {
 										bouncers[i]->dy = -bouncers[i]->dy;
-										squares[l][c]--;
-									}
-								}
-							}
-						}
-
-						for (int l=0; l<LINHAS_QUADRADO; l++) {
-							if(calcSquareYi(l, squareSide) <= bouncers[i]->y && calcSquareYf(l, squareSide) >= bouncers[i]->y) {
-								for (int c=1; c<COLUNAS_QUADRADO; c++) {
-									if (squares[l][c] > 0 && calcSquareXi(c, squareSide) <= bouncers[i]->x + BOUNCER_RADIUS && calcSquareXf(c, squareSide) >= bouncers[i]->x - BOUNCER_RADIUS) {
+										squares[bouncerI][bouncerJ + 1]--;
+										printf("bouncer: %d %d\n", bouncerI, bouncerJ);
+										printf("rebateu no %d %d\n", bouncerI, bouncerJ + 1);
+										printf("squares[%d][%d] = %d\n", bouncerI, bouncerJ+1, squares[bouncerI][bouncerJ+1]);
+									} else if (yi <= bouncers[i]->y + BOUNCER_RADIUS && squares[bouncerI + 1][bouncerJ] > 0) {
 										bouncers[i]->dx = -bouncers[i]->dx;
-										squares[l][c]--;
+										squares[bouncerI + 1][bouncerJ]--;
+										printf("bouncer: %d %d\n", bouncerI, bouncerJ);
+										printf("rebateu no %d %d\n", bouncerI + 1, bouncerJ);
+										printf("squares[%d][%d] = %d\n", bouncerI+1, bouncerJ, squares[bouncerI+1][bouncerJ]);
+									}
+								} else {
+									float xf = calcSquareXf(bouncerJ - 1, squareSide);
+									float yi = calcSquareYi(bouncerI + 1, squareSide);
+									if ((xf >= bouncers[i]->x - BOUNCER_RADIUS)
+										&& (yi <= bouncers[i]->y + BOUNCER_RADIUS)) {
+											if (squares[bouncerI + 1][bouncerJ - 1] > 0) {
+												// exit(0);
+												printf("QUINOU\n");
+											}
+									} else if (xf >= bouncers[i]->x - BOUNCER_RADIUS && squares[bouncerI][bouncerJ - 1] > 0) {
+										bouncers[i]->dy = -bouncers[i]->dy;
+										squares[bouncerI][bouncerJ - 1]--;
+										printf("bouncer: %d %d\n", bouncerI, bouncerJ);
+										printf("rebateu no %d %d\n", bouncerI, bouncerJ - 1);
+										printf("squares[%d][%d] = %d\n", bouncerI, bouncerJ - 1, squares[bouncerI][bouncerJ - 1]);
+									} else if (yi <= bouncers[i]->y + BOUNCER_RADIUS && squares[bouncerI + 1][bouncerJ] > 0) {
+										bouncers[i]->dx = -bouncers[i]->dx;
+										squares[bouncerI + 1][bouncerJ]--;
+										printf("bouncer: %d %d\n", bouncerI, bouncerJ);
+										printf("rebateu no %d %d\n", bouncerI + 1, bouncerJ);
+										printf("squares[%d][%d] = %d\n", bouncerI + 1, bouncerJ, squares[bouncerI + 1][bouncerJ]);
+									}
+								}
+							} else {
+								if (bouncers[i]->dx > 0) {
+									float xi = calcSquareXi(bouncerJ + 1, squareSide);
+									float yf = calcSquareYf(bouncerI - 1, squareSide);
+									if ((xi <= bouncers[i]->x + BOUNCER_RADIUS)
+										&& (yf >= bouncers[i]->y - BOUNCER_RADIUS)) {
+											if (squares[bouncerI - 1][bouncerJ + 1] > 0) {
+												// exit(0);
+												printf("QUINOU\n");
+
+											}
+									} else if (xi <= bouncers[i]->x + BOUNCER_RADIUS && squares[bouncerI][bouncerJ + 1] > 0) {
+										bouncers[i]->dy = -bouncers[i]->dy;
+										squares[bouncerI][bouncerJ + 1]--;
+										printf("bouncer: %d %d\n", bouncerI, bouncerJ);
+										printf("rebateu no %d %d\n", bouncerI, bouncerJ + 1);
+										printf("squares[%d][%d] = %d\n", bouncerI, bouncerJ + 1, squares[bouncerI][bouncerJ + 1]);
+									} else if (yf >= bouncers[i]->y - BOUNCER_RADIUS && squares[bouncerI - 1][bouncerJ] > 0) {
+										bouncers[i]->dx = -bouncers[i]->dx;
+										squares[bouncerI - 1][bouncerJ]--;
+										printf("bouncer: %d %d\n", bouncerI, bouncerJ);
+										printf("rebateu no %d %d\n", bouncerI - 1, bouncerJ);
+										printf("squares[%d][%d] = %d\n", bouncerI - 1, bouncerJ, squares[bouncerI - 1][bouncerJ]);
+									}
+								} else {
+									float xf = calcSquareXf(bouncerJ - 1, squareSide);
+									float yf = calcSquareYf(bouncerI - 1, squareSide);
+									if ((xf >= bouncers[i]->x - BOUNCER_RADIUS)
+										&& (yf >= bouncers[i]->y - BOUNCER_RADIUS)) {
+											if (squares[bouncerI - 1][bouncerJ - 1] > 0) {
+												// exit(0);
+												printf("QUINOU\n");
+
+											}
+									} else if (xf >= bouncers[i]->x - BOUNCER_RADIUS && squares[bouncerI][bouncerJ - 1] > 0) {
+										bouncers[i]->dy = -bouncers[i]->dy;
+										squares[bouncerI][bouncerJ - 1]--;
+										printf("bouncer: %d %d\n", bouncerI, bouncerJ);
+										printf("rebateu no %d %d\n", bouncerI, bouncerJ - 1);
+										printf("squares[%d][%d] = %d\n", bouncerI, bouncerJ - 1, squares[bouncerI][bouncerJ - 1]);
+									} else if (yf >= bouncers[i]->y - BOUNCER_RADIUS && squares[bouncerI - 1][bouncerJ] > 0) {
+										bouncers[i]->dx = -bouncers[i]->dx;
+										squares[bouncerI - 1][bouncerJ]--;
+										printf("bouncer: %d %d\n", bouncerI, bouncerJ);
+										printf("rebateu no %d %d\n", bouncerI - 1, bouncerJ);
+										printf("squares[%d][%d] = %d\n", bouncerI - 1, bouncerJ, squares[bouncerI - 1][bouncerJ]);
 									}
 								}
 							}
 						}
-
 						bouncers[i]->x += bouncers[i]->dx;
 						bouncers[i]->y += bouncers[i]->dy;
 						
