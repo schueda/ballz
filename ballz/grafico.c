@@ -92,6 +92,10 @@ void draw_squares(window *win, int squares[][7], float offsetY) {
 			if (squares[i][j] > 0) {
 				al_draw_filled_rectangle(calcSquareXi(j, l), calcSquareYi(i, l) + offsetY, calcSquareXf(j, l), calcSquareYf(i, l) + offsetY, al_map_rgb(255-squares[i][j], squares[i][j], 128));
 			}
+			if (squares[i][j] == -1) {
+				al_draw_filled_circle(calcSquareMidX(j, l), calcSquareMidY(i, l) + offsetY, BOUNCER_RADIUS, BRANCO);
+				al_draw_circle(calcSquareMidX(j, l), calcSquareMidY(i, l) + offsetY, BOUNCER_RADIUS + 10, BRANCO, 5);
+			}
 		}
 	}
 }

@@ -13,6 +13,14 @@ float calcSquareYi(float i, float l) {
     return i * 1.1*l;
 }
 
+float calcSquareMidX(float j, float l) {
+    return (calcSquareXi(j, l) + calcSquareXf(j, l))/2;
+};
+
+float calcSquareMidY(float i, float l) {
+    return (calcSquareYi(i, l) + calcSquareYf(i, l))/2;
+}
+
 float calcSquareXf(float j, float l) {
     return (j+1) * 1.1*l;
 }

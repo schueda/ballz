@@ -31,6 +31,8 @@ float calcSquareSide(float dispWidth);
 
 float calcSquareXi(float j, float l);
 float calcSquareYi(float i, float l);
+float calcSquareMidX(float j, float l);
+float calcSquareMidY(float i, float l);
 float calcSquareXf(float j, float l);
 float calcSquareYf(float i, float l);
 
