@@ -186,11 +186,10 @@ int main(int argc, char *argv[]) {
 
 		case SHOOTING:
 			if (addedNewBouncers) {
-				bouncer_t **newBouncers = realloc(bouncers, game.bouncers);
-				if (newBouncers == NULL) {
-					perror("Error reallocking bouncers");
-				}
-				bouncers = newBouncers;
+				bouncer_t *bouncer = bouncers[0];
+				free(bouncers);
+				bouncers = calloc(sizeof(bouncer_t) * game.bouncers, game.bouncers);
+				bouncers[0] = bouncer;
 				addedNewBouncers = false;
 			}
 			if (ev.type == ALLEGRO_EVENT_TIMER) {
@@ -263,6 +262,8 @@ int main(int argc, char *argv[]) {
 						bouncers[i]->x += bouncers[i]->dx;
 						bouncers[i]->y += bouncers[i]->dy;
 						
+						draw_shoot(&win, bouncers, game.bouncers, squares);
+						
 						if ((bouncers[i]->dy > 0) && (bouncers[i]->y >= shooting_y)) {
 							arrivalCounter++;
 							bouncers[i]->dx = 0;
@@ -290,7 +291,6 @@ int main(int argc, char *argv[]) {
 
 					}
 				}
-				draw_shoot(&win, bouncers, game.bouncers, squares);
 			}
 			break;
 
