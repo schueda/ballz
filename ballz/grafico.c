@@ -64,7 +64,7 @@ window graphinit(int res_width, int res_height) {
 }
 
 void draw_menu(window *win) {
-	// al_clear_to_color(PRETO);
+	al_clear_to_color(PRETO);
 
 	// char *path = al_get_current_directory();
 	// strcat(path, "/dimitri/dimitri.ttf");
@@ -81,7 +81,7 @@ void draw_menu(window *win) {
 	// free(font);
 	// free(button);
 
-	// al_flip_display();
+	al_flip_display();
 }
 
 void draw_squares(window *win, int squares[][7], float offsetY) {
@@ -90,7 +90,7 @@ void draw_squares(window *win, int squares[][7], float offsetY) {
 	for (i = 0; i < LINHAS_QUADRADO; ++i) {
 		for (j = 0; j < COLUNAS_QUADRADO; ++j) {
 			if (squares[i][j] > 0) {
-				al_draw_filled_rectangle(calcSquareXi(j, l), calcSquareYi(i, l) + offsetY, calcSquareXf(j, l), calcSquareYf(i, l) + offsetY, al_map_rgb(255-squares[i][j], squares[i][j], 128));
+				al_draw_filled_rectangle(calcSquareXi(j, l), calcSquareYi(i, l) + offsetY, calcSquareXf(j, l), calcSquareYf(i, l) + offsetY, al_map_rgb(240 - 3 * squares[i][j]%80, 172 - 3 * squares[i][j]%57, 46 + 3 * squares[i][j]%70));
 			}
 			if (squares[i][j] == -1) {
 				al_draw_filled_circle(calcSquareMidX(j, l), calcSquareMidY(i, l) + offsetY, BOUNCER_RADIUS, BRANCO);

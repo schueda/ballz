@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "game_helpers.h"
 
 float calcSquareSide(float dispWidth) {
@@ -44,4 +43,15 @@ int calcjMatrixPositionf(float xf, float l) {
 
 int calciMatrixPositionf(float yf, float l) {
     return (yf/(1.1*l)) - 10/11;
+}
+
+
+bouncer_t *createBouncer(float x, float y) {
+	bouncer_t *bouncer = malloc(sizeof(bouncer_t));
+	bouncer->dx = 0;
+	bouncer->dy = 0;
+	bouncer->x = x;
+	bouncer->y = y;
+
+	return bouncer;
 }

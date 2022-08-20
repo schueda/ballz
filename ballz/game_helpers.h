@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #define BOUNCER_RADIUS 12
 
 #define SPEED_FACTOR 20
@@ -40,3 +43,5 @@ int calcjMatrixPositioni(float xi, float l);
 int calciMatrixPositioni(float yi, float l);
 int calcjMatrixPositionf(float xf, float l);
 int calciMatrixPositionf(float yf, float l);
+
+bouncer_t *createBouncer(float x, float y);

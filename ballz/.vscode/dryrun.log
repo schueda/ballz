@@ -1,0 +1,8 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory `/Users/andreschueda/Faculdade/TerceiroSemestre/programacao2/trabalho2/ballz'
+gcc -I . -std=c99 -Wall   -c -o ballz.o ballz.c
+gcc -I . -std=c99 -Wall   -c -o grafico.o grafico.c
+gcc -I . -std=c99 -Wall   -c -o game_helpers.o game_helpers.c
+gcc ballz.o grafico.o game_helpers.o -I . -std=c99 -Wall -lallegro_image -lallegro_primitives -lallegro_dialog -lallegro_ttf -lallegro_font -lallegro -lallegro_main -o ballz
+make: Leaving directory `/Users/andreschueda/Faculdade/TerceiroSemestre/programacao2/trabalho2/ballz'
+ 
