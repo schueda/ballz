@@ -8,7 +8,7 @@
 
 window graphinit(int res_width, int res_height) {
 	int i;
-	window win = {NULL, NULL, NULL, {0, 0, 0, 0}};
+	window win = {NULL, NULL, NULL, {0, 0, 0, 0}, NULL};
 
 	/* Inicializa a Allegro */
 	al_init();
@@ -60,26 +60,44 @@ window graphinit(int res_width, int res_height) {
 	al_flip_display();
 	al_start_timer(win.timer);
 
+	char *font_path = al_get_current_directory();
+	strcat(font_path, "/dimitri/dimitri.ttf");
+	char *safe_font_path = malloc(strlen(font_path) + 1);
+	strcpy(safe_font_path, font_path);
+
+	printf("safe_font_path: %s\n", safe_font_path);
+
+	fonts_t *fonts = malloc(sizeof(fonts_t));
+	printf("fonts: %p\n", fonts);
+
+	printf("loading title font\n");
+	printf("safe_font_path: %s\n", safe_font_path);
+	fonts->title_font = al_load_ttf_font(safe_font_path, 70, 0);
+	printf("fonts->title_font: %p\n", fonts->title_font);
+
+	printf("loading medium font\n");
+	printf("safe_font_path: %s\n", safe_font_path);
+	fonts->medium_font = al_load_ttf_font(safe_font_path, 50, 0);
+	printf("fonts->medium_font: %p\n", fonts->medium_font);
+
+	printf("loading small font\n");
+	printf("safe_font_path: %s\n", safe_font_path);
+	fonts->small_font = al_load_ttf_font(safe_font_path, 15, 0);
+	printf("fonts->small_font: %p\n", fonts->small_font);
+
+	win.fonts = fonts;
+	printf("win.fonts: %p\n", win.fonts);
+
 	return (win);
 }
 
 void draw_menu(window *win) {
 	al_clear_to_color(PRETO);
 
-	// char *path = al_get_current_directory();
-	// strcat(path, "/dimitri/dimitri.ttf");
-	// ALLEGRO_FONT *font = al_load_ttf_font(path, 100, 0);
-	// printf("%p", font);
-	// fflush(stdout);
-
-	// al_draw_text(font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.2, ALLEGRO_ALIGN_CENTRE, "BALLz");
+	al_draw_text(win->fonts->title_font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.2, ALLEGRO_ALIGN_CENTRE, "BALLz");
 	
-	// ALLEGRO_BITMAP *button = al_load_bitmap("button.png");
-	// al_draw_bitmap(button, (win->disp_data.width - al_get_bitmap_width(button)) * 0.5, win->disp_data.height * 0.6, 0);
-	
-	// free(path);
-	// free(font);
-	// free(button);
+	ALLEGRO_BITMAP *button = al_load_bitmap("button.png");
+	al_draw_bitmap(button, (win->disp_data.width - al_get_bitmap_width(button)) * 0.5, win->disp_data.height * 0.6, 0);
 
 	al_flip_display();
 }
@@ -172,5 +190,10 @@ void graphdeinit(window win) {
 	al_destroy_timer(win.timer);
 	al_destroy_event_queue(win.event_queue);
 	al_destroy_display(win.display);
+
+	free(win.fonts->title_font);
+	free(win.fonts->medium_font);
+	free(win.fonts->small_font);
+	free(win.fonts);
 }
 

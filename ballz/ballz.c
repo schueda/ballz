@@ -260,15 +260,31 @@ int main(int argc, char *argv[]) {
 							}
 
 							if (arrivalCounter == game.bouncers) {
-								state = SETUP;
-								if (newBouncersCount > 0) {
-									willAddNewBouncers = true;
-								}
+								bouncer_t *auxBouncer = bouncers[i];
+								bouncers[i] = bouncers[game.bouncers - 1];
+								bouncers[game.bouncers - 1] = auxBouncer;
+							}
+						}
 
-								launchIndex = 0;
-								game.shooting_x = bouncers[0]->x;
-								arrivalCounter = 0;
-							}	
+						if (arrivalCounter > 0 && bouncers[i]->y >= shooting_y) {
+							if (bouncers[i]->x > bouncers[0]->x) {
+								bouncers[i]->x -= SPEED_FACTOR;
+							} 
+							if (bouncers[i]->x < bouncers[0]->x) {
+								bouncers[i]->x += SPEED_FACTOR;
+							}
+							if (bouncers[i]->x <= bouncers[0]->x + SPEED_FACTOR && bouncers[i]->x >= bouncers[0]->x - SPEED_FACTOR) {
+								bouncers[i]->x = bouncers[0]->x;
+
+								if (arrivalCounter == game.bouncers && i == game.bouncers - 1) {
+									state = SETUP;
+									willAddNewBouncers = (newBouncersCount > 0);
+
+									launchIndex = 0;
+									game.shooting_x = bouncers[0]->x;
+									arrivalCounter = 0;
+								}
+							}
 						}
 					}
 				}

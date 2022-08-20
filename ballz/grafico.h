@@ -16,10 +16,17 @@ typedef struct {
 #define PIXEL(r,g,b) (al_map_rgb((unsigned char) r, (unsigned char) g, (unsigned char) b))
 
 typedef struct {
-  ALLEGRO_EVENT_QUEUE *event_queue;
-  ALLEGRO_TIMER *timer;
-  ALLEGRO_DISPLAY *display;
-  ALLEGRO_DISPLAY_MODE disp_data;
+  	ALLEGRO_FONT *title_font;
+	ALLEGRO_FONT *medium_font;
+	ALLEGRO_FONT *small_font;
+} fonts_t;
+
+typedef struct {
+	ALLEGRO_EVENT_QUEUE *event_queue;
+	ALLEGRO_TIMER *timer;
+	ALLEGRO_DISPLAY *display;
+	ALLEGRO_DISPLAY_MODE disp_data;
+	fonts_t *fonts;
 } window;
 
 /* Inicia sistema grafico Allegro 5.0 */
