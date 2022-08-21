@@ -22,12 +22,14 @@ struct bouncer {
 typedef struct game game_t;
 struct game {
 	int score;
+	int highscore;
 	int bouncers;
 
 	float dx;
 	float dy;
 
 	float shooting_x;
+	float shooting_y;
 };
 
 float calcSquareSide(float dispWidth);

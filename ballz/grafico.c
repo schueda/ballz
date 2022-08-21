@@ -83,12 +83,12 @@ window graphinit(int res_width, int res_height) {
 
 	printf("loading medium font\n");
 	printf("safe_font_path: %s\n", safe_font_path);
-	fonts->medium_font = al_load_ttf_font(safe_font_path, 60, 0);
+	fonts->medium_font = al_load_ttf_font(safe_font_path, 50, 0);
 	printf("fonts->medium_font: %p\n", fonts->medium_font);
 
 	printf("loading small font\n");
 	printf("safe_font_path: %s\n", safe_font_path);
-	fonts->small_font = al_load_ttf_font(safe_font_path, 50, 0);
+	fonts->small_font = al_load_ttf_font(safe_font_path, 30, 0);
 	printf("fonts->small_font: %p\n", fonts->small_font);
 
 	win.fonts = fonts;
@@ -116,7 +116,7 @@ void draw_squares(window *win, int squares[][7], float offsetY) {
 			if (squares[i][j] > 0) {
 				al_draw_filled_rectangle(calcSquareXi(j, l), calcSquareYi(i, l) + offsetY, calcSquareXf(j, l), calcSquareYf(i, l) + offsetY, al_map_rgb(240 - 3 * squares[i][j]%80, 172 - 3 * squares[i][j]%57, 46 + 3 * squares[i][j]%70));
 				char text[10];
-				int textOffset = al_get_font_line_height(win->fonts->small_font)/2;x`
+				int textOffset = al_get_font_line_height(win->fonts->small_font)/2;
 				sprintf(text, "%d", squares[i][j]);
 				al_draw_text(win->fonts->small_font, BRANCO, calcSquareMidX(j, l), calcSquareMidY(i, l) + offsetY - textOffset, ALLEGRO_ALIGN_CENTER, text);
 			}
@@ -132,27 +132,37 @@ void draw_ground(window *win, bouncer_t *bouncer) {
 	al_draw_filled_rectangle(0, calcSquareYf(8, calcSquareSide(win->disp_data.width)), win->disp_data.width, win->disp_data.height, CINZA_ESCURO);
 }
 
-void draw_wait(window *win, bouncer_t *bouncer, int squares[][7]) {
+void draw_score(window *win, game_t *game) {
+	char text[20];
+	sprintf(text, "Score: %d", game->score);
+	al_draw_text(win->fonts->small_font, BRANCO, 20, game->shooting_y + BOUNCER_RADIUS + 5, ALLEGRO_ALIGN_LEFT, text);
+	sprintf(text, "Highscore: %d", game->highscore);
+	al_draw_text(win->fonts->small_font, BRANCO, win->disp_data.width-20, game->shooting_y + BOUNCER_RADIUS + 5, ALLEGRO_ALIGN_RIGHT, text);
+}
+
+void draw_wait(window *win, bouncer_t *bouncer, int squares[][7], game_t *game) {
 	if(al_event_queue_is_empty(win->event_queue)) {
 		al_clear_to_color(PRETO);
 		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_RADIUS, BRANCO);
 		draw_ground(win, bouncer);
 		draw_squares(win, squares, 0);
+		draw_score(win, game);
 		al_flip_display();
 	}
 }
 
-void draw_setup(window *win, bouncer_t *bouncer, int squares[][COLUNAS_QUADRADO], float offsetY) {
+void draw_setup(window *win, bouncer_t *bouncer, int squares[][COLUNAS_QUADRADO], float offsetY, game_t *game) {
 	if(al_event_queue_is_empty(win->event_queue)) {
 		al_clear_to_color(PRETO);
 		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_RADIUS, BRANCO);
 		draw_ground(win, bouncer);
 		draw_squares(win, squares, offsetY);
+		draw_score(win, game);
 		al_flip_display();
 	}
 }
 
-void draw_aim(window *win, bouncer_t *bouncer, float distX, float distY, float dist, int squares[][COLUNAS_QUADRADO]) {
+void draw_aim(window *win, bouncer_t *bouncer, float distX, float distY, float dist, int squares[][COLUNAS_QUADRADO], game_t *game) {
 	if(al_is_event_queue_empty(win->event_queue)) {
 		al_clear_to_color(PRETO);
 		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_RADIUS, BRANCO);
@@ -177,11 +187,13 @@ void draw_aim(window *win, bouncer_t *bouncer, float distX, float distY, float d
 
 								bouncer->x + (BOUNCER_RADIUS + 5) * distX/dist - 7 * distY/dist, 
 								bouncer->y + (BOUNCER_RADIUS + 5) * distY/dist + 7 * distX/dist, BRANCO);
+
+		draw_score(win, game);
 		al_flip_display();
 	}
 }
 
-void draw_shoot(window *win, bouncer_t **bouncers, int bouncersCount, int squares[][COLUNAS_QUADRADO]) {
+void draw_shoot(window *win, bouncer_t **bouncers, int bouncersCount, int squares[][COLUNAS_QUADRADO], game_t *game) {
 	if(al_is_event_queue_empty(win->event_queue)) {
 		al_clear_to_color(PRETO);
 		for(int i=0; i<bouncersCount; i++) {
@@ -191,6 +203,7 @@ void draw_shoot(window *win, bouncer_t **bouncers, int bouncersCount, int square
 		}
 		draw_squares(win, squares, 0);
 		draw_ground(win, bouncers[0]);
+		draw_score(win, game);
 		al_flip_display();
 	}
 }
