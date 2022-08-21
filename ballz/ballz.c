@@ -16,35 +16,6 @@
 
 enum {MENU, SETUP, WAITING, AIMING, SHOOTING, GAMEOVER} state;
 
-void setupGame(game_t *game, window *win) {
-	game->score = 0;
-	game->bouncers = 1;
-	game->dx = 0;
-	game->dy = 0;
-	game->shooting_x = (win->disp_data.width - BOUNCER_RADIUS) / 2.0;
-}
-
-void setupSquares(int squares[][COLUNAS_QUADRADO]) {
-	for (int i = 0; i < LINHAS_QUADRADO; ++i) {
-		for (int j = 0; j < COLUNAS_QUADRADO; ++j) {
-			squares[i][j] = 0;
-		}
-	}
-}
-
-void setupBouncers(bouncer_t ***bouncers, window *win, float shooting_y) {
-	*bouncers = calloc(sizeof(bouncer_t), 1);
-	*bouncers[0] = createBouncer(win->disp_data.width * 0.5, shooting_y);
-}
-
-void destroyBouncers(bouncer_t **bouncers, game_t *game) {
-	for(int i = 0; i < game->bouncers; ++i) {
-		printf("bouncers[%d] = %p\n", i, bouncers[i]);
-		free(bouncers[i]);
-	}
-	free(bouncers);
-}
-
 int main(int argc, char *argv[]) {
 	window win = graphinit(RES_WIDTH, RES_HEIGHT);
 	srand(time(NULL));
@@ -91,9 +62,9 @@ int main(int argc, char *argv[]) {
 			}
 			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
 				state = SETUP;
-				setupGame(&game, &win);
+				setupGame(&game, win.disp_data.width);
 				setupSquares(squares);
-				setupBouncers(&bouncers, &win, shooting_y);
+				setupBouncers(&bouncers, win.disp_data.width, shooting_y);
 				menuDrew = false;
 				canShoot = false;
 				addedNewSquares = false;

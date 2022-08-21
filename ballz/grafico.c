@@ -83,12 +83,12 @@ window graphinit(int res_width, int res_height) {
 
 	printf("loading medium font\n");
 	printf("safe_font_path: %s\n", safe_font_path);
-	fonts->medium_font = al_load_ttf_font(safe_font_path, 50, 0);
+	fonts->medium_font = al_load_ttf_font(safe_font_path, 60, 0);
 	printf("fonts->medium_font: %p\n", fonts->medium_font);
 
 	printf("loading small font\n");
 	printf("safe_font_path: %s\n", safe_font_path);
-	fonts->small_font = al_load_ttf_font(safe_font_path, 15, 0);
+	fonts->small_font = al_load_ttf_font(safe_font_path, 50, 0);
 	printf("fonts->small_font: %p\n", fonts->small_font);
 
 	win.fonts = fonts;
@@ -100,7 +100,7 @@ window graphinit(int res_width, int res_height) {
 void draw_menu(window *win) {
 	al_clear_to_color(PRETO);
 
-	al_draw_text(win->fonts->title_font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.2, ALLEGRO_ALIGN_CENTRE, "BALLz");
+	al_draw_text(win->fonts->title_font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.2, ALLEGRO_ALIGN_CENTER, "BALLz");
 	
 	ALLEGRO_BITMAP *button = al_load_bitmap("button.png");
 	al_draw_bitmap(button, (win->disp_data.width - al_get_bitmap_width(button)) * 0.5, win->disp_data.height * 0.6, 0);
@@ -115,6 +115,10 @@ void draw_squares(window *win, int squares[][7], float offsetY) {
 		for (j = 0; j < COLUNAS_QUADRADO; ++j) {
 			if (squares[i][j] > 0) {
 				al_draw_filled_rectangle(calcSquareXi(j, l), calcSquareYi(i, l) + offsetY, calcSquareXf(j, l), calcSquareYf(i, l) + offsetY, al_map_rgb(240 - 3 * squares[i][j]%80, 172 - 3 * squares[i][j]%57, 46 + 3 * squares[i][j]%70));
+				char text[10];
+				int textOffset = al_get_font_line_height(win->fonts->small_font)/2;x`
+				sprintf(text, "%d", squares[i][j]);
+				al_draw_text(win->fonts->small_font, BRANCO, calcSquareMidX(j, l), calcSquareMidY(i, l) + offsetY - textOffset, ALLEGRO_ALIGN_CENTER, text);
 			}
 			if (squares[i][j] == -1) {
 				al_draw_filled_circle(calcSquareMidX(j, l), calcSquareMidY(i, l) + offsetY, BOUNCER_RADIUS, BRANCO);

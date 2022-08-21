@@ -55,3 +55,31 @@ bouncer_t *createBouncer(float x, float y) {
 
 	return bouncer;
 }
+
+void setupGame(game_t *game, float dispWidth) {
+	game->score = 0;
+	game->bouncers = 1;
+	game->dx = 0;
+	game->dy = 0;
+	game->shooting_x = (dispWidth - BOUNCER_RADIUS) / 2.0;
+}
+
+void setupSquares(int squares[][COLUNAS_QUADRADO]) {
+	for (int i = 0; i < LINHAS_QUADRADO; ++i) {
+		for (int j = 0; j < COLUNAS_QUADRADO; ++j) {
+			squares[i][j] = 0;
+		}
+	}
+}
+
+void setupBouncers(bouncer_t ***bouncers, float dispWidth, float shooting_y) {
+	*bouncers = calloc(sizeof(bouncer_t), 1);
+	*bouncers[0] = createBouncer(dispWidth * 0.5, shooting_y);
+}
+
+void destroyBouncers(bouncer_t **bouncers, game_t *game) {
+	for(int i = 0; i < game->bouncers; ++i) {
+		free(bouncers[i]);
+	}
+	free(bouncers);
+}
