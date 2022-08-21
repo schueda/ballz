@@ -24,6 +24,7 @@ struct game {
 	int score;
 	int highscore;
 	int bouncers;
+	int thrown_bouncers;
 
 	float dx;
 	float dy;
@@ -32,23 +33,18 @@ struct game {
 	float shooting_y;
 };
 
-float calcSquareSide(float dispWidth);
+float calc_square_side(float dispWidth);
 
-float calcSquareXi(float j, float l);
-float calcSquareYi(float i, float l);
-float calcSquareMidX(float j, float l);
-float calcSquareMidY(float i, float l);
-float calcSquareXf(float j, float l);
-float calcSquareYf(float i, float l);
-
-int calcjMatrixPositioni(float xi, float l);
-int calciMatrixPositioni(float yi, float l);
-int calcjMatrixPositionf(float xf, float l);
-int calciMatrixPositionf(float yf, float l);
+float calc_square_i_x(float j, float l);
+float calc_square_i_y(float i, float l);
+float calc_square_mid_x(float j, float l);
+float calc_square_mid_y(float i, float l);
+float calc_square_f_x(float j, float l);
+float calc_square_f_y(float i, float l);
 
 bouncer_t *createBouncer(float x, float y);
 
-void setupGame(game_t *game, float dispWidth);
-void setupSquares(int squares[][COLUNAS_QUADRADO]);
-void setupBouncers(bouncer_t ***bouncers, float dispWidth, float shooting_y);
-void destroyBouncers(bouncer_t **bouncers, game_t *game);
+void setup_game(game_t *game, float dispWidth);
+void setup_squares(int squares[][COLUNAS_QUADRADO]);
+void setup_bouncers(bouncer_t ***bouncers, float dispWidth, float shooting_y);
+void destroy_bouncers(bouncer_t **bouncers, game_t *game);

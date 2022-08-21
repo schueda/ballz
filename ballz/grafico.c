@@ -6,7 +6,7 @@
 
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 
-window graphinit(int res_width, int res_height) {
+window graph_init(int res_width, int res_height) {
 	int i;
 	window win = {NULL, NULL, NULL, {0, 0, 0, 0}, NULL};
 
@@ -105,31 +105,33 @@ void draw_menu(window *win) {
 	ALLEGRO_BITMAP *button = al_load_bitmap("button.png");
 	al_draw_bitmap(button, (win->disp_data.width - al_get_bitmap_width(button)) * 0.5, win->disp_data.height * 0.6, 0);
 
+	al_draw_text(win->fonts->medium_font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.6 + 7, ALLEGRO_ALIGN_CENTER, "Play");
+
 	al_flip_display();
 }
 
 void draw_squares(window *win, int squares[][7], float offsetY) {
-	float l = calcSquareSide(win->disp_data.width);
+	float l = calc_square_side(win->disp_data.width);
 	int i, j;
 	for (i = 0; i < LINHAS_QUADRADO; ++i) {
 		for (j = 0; j < COLUNAS_QUADRADO; ++j) {
 			if (squares[i][j] > 0) {
-				al_draw_filled_rectangle(calcSquareXi(j, l), calcSquareYi(i, l) + offsetY, calcSquareXf(j, l), calcSquareYf(i, l) + offsetY, al_map_rgb(240 - 3 * squares[i][j]%80, 172 - 3 * squares[i][j]%57, 46 + 3 * squares[i][j]%70));
+				al_draw_filled_rectangle(calc_square_i_x(j, l), calc_square_i_y(i, l) + offsetY, calc_square_f_x(j, l), calc_square_f_y(i, l) + offsetY, al_map_rgb(240 - 3 * squares[i][j]%80, 172 - 3 * squares[i][j]%57, 46 + 3 * squares[i][j]%70));
 				char text[10];
 				int textOffset = al_get_font_line_height(win->fonts->small_font)/2;
 				sprintf(text, "%d", squares[i][j]);
-				al_draw_text(win->fonts->small_font, BRANCO, calcSquareMidX(j, l), calcSquareMidY(i, l) + offsetY - textOffset, ALLEGRO_ALIGN_CENTER, text);
+				al_draw_text(win->fonts->small_font, BRANCO, calc_square_mid_x(j, l), calc_square_mid_y(i, l) + offsetY - textOffset, ALLEGRO_ALIGN_CENTER, text);
 			}
 			if (squares[i][j] == -1) {
-				al_draw_filled_circle(calcSquareMidX(j, l), calcSquareMidY(i, l) + offsetY, BOUNCER_RADIUS, BRANCO);
-				al_draw_circle(calcSquareMidX(j, l), calcSquareMidY(i, l) + offsetY, BOUNCER_RADIUS + 10, BRANCO, 5);
+				al_draw_filled_circle(calc_square_mid_x(j, l), calc_square_mid_y(i, l) + offsetY, BOUNCER_RADIUS, BRANCO);
+				al_draw_circle(calc_square_mid_x(j, l), calc_square_mid_y(i, l) + offsetY, BOUNCER_RADIUS + 10, BRANCO, 5);
 			}
 		}
 	}
 }
 
 void draw_ground(window *win, bouncer_t *bouncer) {
-	al_draw_filled_rectangle(0, calcSquareYf(8, calcSquareSide(win->disp_data.width)), win->disp_data.width, win->disp_data.height, CINZA_ESCURO);
+	al_draw_filled_rectangle(0, calc_square_f_y(8, calc_square_side(win->disp_data.width)), win->disp_data.width, win->disp_data.height, CINZA_ESCURO);
 }
 
 void draw_score(window *win, game_t *game) {
@@ -140,6 +142,12 @@ void draw_score(window *win, game_t *game) {
 	al_draw_text(win->fonts->small_font, BRANCO, win->disp_data.width-20, game->shooting_y + BOUNCER_RADIUS + 5, ALLEGRO_ALIGN_RIGHT, text);
 }
 
+void draw_bouncers_count(window *win, game_t *game) {
+	char text[20];
+	sprintf(text, "x%d", game->bouncers - game->thrown_bouncers);
+	al_draw_text(win->fonts->small_font, CINZA, game->shooting_x - BOUNCER_RADIUS - 20, game->shooting_y - BOUNCER_RADIUS - 30, ALLEGRO_ALIGN_LEFT, text);
+}
+
 void draw_wait(window *win, bouncer_t *bouncer, int squares[][7], game_t *game) {
 	if(al_event_queue_is_empty(win->event_queue)) {
 		al_clear_to_color(PRETO);
@@ -147,6 +155,7 @@ void draw_wait(window *win, bouncer_t *bouncer, int squares[][7], game_t *game) 
 		draw_ground(win, bouncer);
 		draw_squares(win, squares, 0);
 		draw_score(win, game);
+		draw_bouncers_count(win, game);
 		al_flip_display();
 	}
 }
@@ -158,6 +167,7 @@ void draw_setup(window *win, bouncer_t *bouncer, int squares[][COLUNAS_QUADRADO]
 		draw_ground(win, bouncer);
 		draw_squares(win, squares, offsetY);
 		draw_score(win, game);
+		draw_bouncers_count(win, game);
 		al_flip_display();
 	}
 }
@@ -168,14 +178,15 @@ void draw_aim(window *win, bouncer_t *bouncer, float distX, float distY, float d
 		al_draw_filled_circle(bouncer->x, bouncer->y, BOUNCER_RADIUS, BRANCO);
 		draw_squares(win, squares, 0);
 		draw_ground(win, bouncer);
+		draw_bouncers_count(win, game);
 
-		float size = min(win->disp_data.height * 0.33 + dist, win->disp_data.height * 0.7);
+		float size = min(win->disp_data.height * 0.33 + dist, win->disp_data.height * 0.8);
 		float spacing = (size - 80)/16;
 		float position = size;
 
 		int i;
 		for(i = 0; i < 16; i++) {
-			al_draw_filled_circle(bouncer->x + position * distX/dist, bouncer->y + position * distY/dist, BOUNCER_RADIUS * 0.6 * size/(win->disp_data.height * 0.7), BRANCO);
+			al_draw_filled_circle(bouncer->x + position * distX/dist, bouncer->y + position * distY/dist, BOUNCER_RADIUS * 0.6 * size/(win->disp_data.height * 0.8), BRANCO);
 			position -= spacing;
 		}
 
@@ -200,6 +211,9 @@ void draw_shoot(window *win, bouncer_t **bouncers, int bouncersCount, int square
 			if (bouncers[i]) {
 				al_draw_filled_circle(bouncers[i]->x, bouncers[i]->y, BOUNCER_RADIUS, BRANCO);
 			}
+		}
+		if (game->thrown_bouncers != game->bouncers) {
+			draw_bouncers_count(win, game);
 		}
 		draw_squares(win, squares, 0);
 		draw_ground(win, bouncers[0]);
@@ -226,7 +240,7 @@ void draw_gameover(window *win, game_t *game) {
 }
 
 
-void graphdeinit(window win) {
+void graph_deinit(window win) {
 	al_destroy_timer(win.timer);
 	al_destroy_event_queue(win.event_queue);
 	al_destroy_display(win.display);

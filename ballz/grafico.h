@@ -31,7 +31,7 @@ typedef struct {
 } window;
 
 /* Inicia sistema grafico Allegro 5.0 */
-window graphinit(int res_width, int res_height);
+window graph_init(int res_width, int res_height);
 
 void draw_menu(window *win);
 void draw_setup(window *win, bouncer_t *bouncer, int squares[][COLUNAS_QUADRADO], float offsetY, game_t *game);
@@ -43,7 +43,7 @@ void draw_gameover(window *win, game_t *game);
 
 
 /* Finaliza sistema grafico Allegro 5.0 */
-void graphdeinit(window win);
+void graph_deinit(window win);
 
 /* Lista de cores */
 #define ACAFRAO                   PIXEL(244,196,48)
