@@ -210,8 +210,17 @@ void draw_shoot(window *win, bouncer_t **bouncers, int bouncersCount, int square
 
 void draw_gameover(window *win, game_t *game) {
 	if(al_is_event_queue_empty(win->event_queue)) {
+		char text[20];
+
 		al_clear_to_color(PRETO);
 		al_draw_text(win->fonts->big_font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.2, ALLEGRO_ALIGN_CENTRE, "GAME OVER");
+		sprintf(text, "Score: %d", game->score);
+		al_draw_text(win->fonts->medium_font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.4, ALLEGRO_ALIGN_CENTRE, text);
+
+		if(game->highscore > 0) { //TODO:MUDAR A LOGICA
+			al_draw_text(win->fonts->small_font, VERDE_CLARO, win->disp_data.width * 0.5, win->disp_data.height * 0.5, ALLEGRO_ALIGN_CENTRE, "New Highscore!");
+		}
+		
 		al_flip_display();
 	}
 }
