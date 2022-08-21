@@ -16,13 +16,43 @@
 
 enum {MENU, SETUP, WAITING, AIMING, SHOOTING, GAMEOVER} state;
 
+void setupGame(game_t *game, window *win) {
+	game->score = 0;
+	game->bouncers = 1;
+	game->dx = 0;
+	game->dy = 0;
+	game->shooting_x = (win->disp_data.width - BOUNCER_RADIUS) / 2.0;
+}
+
+void setupSquares(int squares[][COLUNAS_QUADRADO]) {
+	for (int i = 0; i < LINHAS_QUADRADO; ++i) {
+		for (int j = 0; j < COLUNAS_QUADRADO; ++j) {
+			squares[i][j] = 0;
+		}
+	}
+}
+
+void setupBouncers(bouncer_t ***bouncers, window *win, float shooting_y) {
+	*bouncers = calloc(sizeof(bouncer_t), 1);
+	*bouncers[0] = createBouncer(win->disp_data.width * 0.5, shooting_y);
+}
+
+void destroyBouncers(bouncer_t **bouncers, game_t *game) {
+	for(int i = 0; i < game->bouncers; ++i) {
+		printf("bouncers[%d] = %p\n", i, bouncers[i]);
+		free(bouncers[i]);
+	}
+	free(bouncers);
+}
+
 int main(int argc, char *argv[]) {
 	window win = graphinit(RES_WIDTH, RES_HEIGHT);
 	srand(time(NULL));
 
 	state = MENU;
 
-	bool sair = false;
+	int i,j;
+
 	bool menuDrew = false;
 	bool canShoot = false;
 	bool addedNewSquares = false;
@@ -35,40 +65,17 @@ int main(int argc, char *argv[]) {
 
 	float offset=0;
 
-	game_t game = {
-		.bouncers = 1,
-		.dx = 0,
-		.dy = 0,
-		.score = 1,
-		.shooting_x = (win.disp_data.width - BOUNCER_RADIUS) / 2.0
-	};
-
-	int squares[LINHAS_QUADRADO][COLUNAS_QUADRADO];
-
-	int i, j;
-	for (i = 0; i < LINHAS_QUADRADO; ++i) {
-		for (j = 0; j < COLUNAS_QUADRADO; ++j) {
-			if (i == 1) {
-				squares[i][j] = rand() % 2;
-			} else {
-				squares[i][j] = 0;
-			}
-		}
-	}
-
 	ALLEGRO_MOUSE_EVENT mouse_down;
-
-
-	bouncer_t **bouncers;
-
-	bouncers = calloc(sizeof(bouncer_t) * game.bouncers, game.bouncers);
 
 	float squareSide = calcSquareSide(win.disp_data.width);
 	float shooting_y = calcSquareYf(8, squareSide) - BOUNCER_RADIUS;
 
-	bouncers[0] = createBouncer(win.disp_data.width/2, shooting_y);
+	game_t game;
+	int squares[LINHAS_QUADRADO][COLUNAS_QUADRADO];
+	bouncer_t **bouncers;
+	
 
-	while (!sair) {
+	while (1) {
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(win.event_queue, &ev);
 
@@ -83,8 +90,21 @@ int main(int argc, char *argv[]) {
 				menuDrew = true;	
 			}
 			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-				state = WAITING;
-				draw_wait(&win, bouncers[0], squares);
+				state = SETUP;
+				setupGame(&game, &win);
+				setupSquares(squares);
+				setupBouncers(&bouncers, &win, shooting_y);
+				menuDrew = false;
+				canShoot = false;
+				addedNewSquares = false;
+				willAddNewBouncers = false;
+
+				launchInterval = 0;
+				launchIndex = 0;
+				arrivalCounter = 0;
+				newBouncersCount = 0;
+
+				offset=0;
 			}
 			break;
 
@@ -94,8 +114,10 @@ int main(int argc, char *argv[]) {
 				for (j=0; j<COLUNAS_QUADRADO; j++) {
 					squares[0][j] = (rand() % 3) * game.score;
 				}
-				int newBallPosition = rand() % COLUNAS_QUADRADO;
-				squares[0][newBallPosition] = -1;
+				if (game.score > 1) {
+					int newBallPosition = rand() % COLUNAS_QUADRADO;
+					squares[0][newBallPosition] = -1;
+				}
 				addedNewSquares = true;
 			}
 			if(ev.type == ALLEGRO_EVENT_TIMER) {
@@ -119,9 +141,12 @@ int main(int argc, char *argv[]) {
 							squares[0][j] = 0;
 						};
 						state = WAITING;
-						addedNewSquares = false;
 						draw_wait(&win, bouncers[0], squares);
-					}
+					}  else {
+						destroyBouncers(bouncers, &game);
+						draw_gameover(&win, &game);
+					};
+					addedNewSquares = false;
 				};
 			}
 			break;
@@ -163,23 +188,25 @@ int main(int argc, char *argv[]) {
 			break;
 
 		case SHOOTING:
-			if (willAddNewBouncers) {
-				game.bouncers += newBouncersCount;
-				bouncer_t **newBouncers = realloc(bouncers, sizeof(bouncer_t) * game.bouncers);
-				if (newBouncers == NULL) {
-					perror("Error reallocking bouncers");
-					exit(1);
-				}
-				bouncers = newBouncers;
+			if (ev.type == ALLEGRO_EVENT_TIMER) {
+				if (willAddNewBouncers) {
+					game.bouncers += newBouncersCount;
+					bouncer_t **newBouncers = realloc(bouncers, sizeof(bouncer_t) * game.bouncers);
+					if (newBouncers == NULL) {
+						perror("Error reallocking bouncers");
+						exit(1);
+					}
+					bouncers = newBouncers;
 
-				for (i=game.bouncers - newBouncersCount; i<game.bouncers; i++) {
-					bouncers[i] = createBouncer(game.shooting_x, shooting_y);
-				}
+					for (i=game.bouncers - newBouncersCount; i<game.bouncers; i++) {
+						bouncers[i] = createBouncer(game.shooting_x, shooting_y);
+					}
 
-				newBouncersCount = 0;
-				willAddNewBouncers = false;
-			}
-			launchInterval++;
+					newBouncersCount = 0;
+					willAddNewBouncers = false;
+				}
+				
+				launchInterval++;
 				if (launchInterval >= 5 && launchIndex < game.bouncers) {
 					launchInterval = 0;
 					bouncers[launchIndex]->x = game.shooting_x;
@@ -285,14 +312,12 @@ int main(int argc, char *argv[]) {
 						}
 					}
 				}
-			if (ev.type == ALLEGRO_EVENT_TIMER) {
 				draw_shoot(&win, bouncers, game.bouncers, squares);
 			}
 			break;
 
 		case GAMEOVER:
 			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-				draw_menu(&win);
 				state = MENU;
 			}
 			break;
@@ -305,7 +330,6 @@ int main(int argc, char *argv[]) {
 		} 
 	}
 
-	free(bouncers);
 	graphdeinit(win);
 	return 0;
 }

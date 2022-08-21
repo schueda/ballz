@@ -17,6 +17,7 @@ typedef struct {
 
 typedef struct {
   	ALLEGRO_FONT *title_font;
+	ALLEGRO_FONT *big_font;
 	ALLEGRO_FONT *medium_font;
 	ALLEGRO_FONT *small_font;
 } fonts_t;
@@ -37,6 +38,7 @@ void draw_setup(window *win, bouncer_t *bouncer, int squares[][COLUNAS_QUADRADO]
 void draw_wait(window *win, bouncer_t *bouncer, int squares[][COLUNAS_QUADRADO]);
 void draw_aim(window *win, bouncer_t *bouncer, float distX, float distY, float dist, int squares[][COLUNAS_QUADRADO]);
 void draw_shoot(window *win, bouncer_t **bouncer, int balls, int squares[][COLUNAS_QUADRADO]);
+void draw_gameover(window *win, game_t *game);
 
 
 

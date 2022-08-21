@@ -72,8 +72,14 @@ window graphinit(int res_width, int res_height) {
 
 	printf("loading title font\n");
 	printf("safe_font_path: %s\n", safe_font_path);
-	fonts->title_font = al_load_ttf_font(safe_font_path, 70, 0);
+	fonts->title_font = al_load_ttf_font(safe_font_path, 100, 0);
 	printf("fonts->title_font: %p\n", fonts->title_font);
+
+	printf("loading big font\n");
+	printf("safe_font_path: %s\n", safe_font_path);
+	fonts->big_font = al_load_ttf_font(safe_font_path, 70, 0);
+	printf("fonts->big_font: %p\n", fonts->big_font);
+
 
 	printf("loading medium font\n");
 	printf("safe_font_path: %s\n", safe_font_path);
@@ -181,6 +187,14 @@ void draw_shoot(window *win, bouncer_t **bouncers, int bouncersCount, int square
 		}
 		draw_squares(win, squares, 0);
 		draw_ground(win, bouncers[0]);
+		al_flip_display();
+	}
+}
+
+void draw_gameover(window *win, game_t *game) {
+	if(al_is_event_queue_empty(win->event_queue)) {
+		al_clear_to_color(PRETO);
+		al_draw_text(win->fonts->big_font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.2, ALLEGRO_ALIGN_CENTRE, "GAME OVER");
 		al_flip_display();
 	}
 }
