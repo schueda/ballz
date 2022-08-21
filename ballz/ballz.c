@@ -179,8 +179,7 @@ int main(int argc, char *argv[]) {
 				newBouncersCount = 0;
 				willAddNewBouncers = false;
 			}
-			if (ev.type == ALLEGRO_EVENT_TIMER) {
-				launchInterval++;
+			launchInterval++;
 				if (launchInterval >= 5 && launchIndex < game.bouncers) {
 					launchInterval = 0;
 					bouncers[launchIndex]->x = game.shooting_x;
@@ -246,8 +245,6 @@ int main(int argc, char *argv[]) {
 						bouncers[i]->x += bouncers[i]->dx;
 						bouncers[i]->y += bouncers[i]->dy;
 						
-						draw_shoot(&win, bouncers, game.bouncers, squares);
-						
 						if ((bouncers[i]->dy > 0) && (bouncers[i]->y >= shooting_y)) {
 							arrivalCounter++;
 							bouncers[i]->dx = 0;
@@ -288,6 +285,8 @@ int main(int argc, char *argv[]) {
 						}
 					}
 				}
+			if (ev.type == ALLEGRO_EVENT_TIMER) {
+				draw_shoot(&win, bouncers, game.bouncers, squares);
 			}
 			break;
 
