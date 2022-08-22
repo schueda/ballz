@@ -1,7 +1,0 @@
-{
-  "makefile.extensionOutputFolder": "./.vscode",
-  "files.associations": {
-    "grafico.h": "c",
-    "allegro_native_dialog.h": "c"
-  }
-}

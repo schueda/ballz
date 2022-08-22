@@ -44,6 +44,18 @@ int main(int argc, char *argv[]) {
 	int squares[LINHAS_QUADRADO][COLUNAS_QUADRADO];
 	bouncer_t **bouncers;
 	game.shooting_y = calc_square_f_y(8, square_side) - BOUNCER_RADIUS;
+
+
+	FILE *score_file;
+	score_file = fopen(".highscore", "r");
+	if (score_file == NULL) {
+		score_file = fopen(".highscore", "w");
+		game.highscore = 0;
+	} else {
+		fscanf(score_file, "%d", &game.highscore);
+	}
+	fclose(score_file);
+
 	
 
 	while (1) {
@@ -64,8 +76,11 @@ int main(int argc, char *argv[]) {
 				if(ev.mouse.x > win.disp_data.width/2 - 100 && ev.mouse.x < win.disp_data.width/2 + 100 && ev.mouse.y > win.disp_data.height/2 - 50 && ev.mouse.y < win.disp_data.height/2 + 50) {
 					state = SETUP;
 					setup_game(&game, win.disp_data.width);
+					
 					setup_squares(squares);
+
 					setup_bouncers(&bouncers, win.disp_data.width, game.shooting_y);
+
 					menu_drew = false;
 					can_shoot = false;
 					added_new_squares = false;
@@ -84,6 +99,9 @@ int main(int argc, char *argv[]) {
 		case SETUP:
 			if (!added_new_squares) {
 				game.score++;
+				if (game.score >= game.highscore) {
+					game.highscore = game.score;
+				}
 				for (j=0; j<COLUNAS_QUADRADO; j++) {
 					squares[0][j] = (rand() % 3) * game.score;
 				}
@@ -117,6 +135,11 @@ int main(int argc, char *argv[]) {
 						draw_wait(&win, bouncers[0], squares, &game);
 					}  else {
 						destroy_bouncers(bouncers, &game);
+						if (game.score >= game.highscore) {
+							score_file = fopen(".highscore", "w");
+							fprintf(score_file, "%d", game.score);
+							fclose(score_file);
+						}
 						draw_gameover(&win, &game);
 					};
 					added_new_squares = false;
