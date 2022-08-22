@@ -235,6 +235,13 @@ void draw_gameover(window *win, game_t *game) {
 		if(game->score >= game->highscore) { 
 			al_draw_text(win->fonts->small_font, VERDE_CLARO, win->disp_data.width * 0.5, win->disp_data.height * 0.5, ALLEGRO_ALIGN_CENTRE, "New Highscore!");
 		}
+
+		ALLEGRO_BITMAP *button = al_load_bitmap("button.png");
+		al_draw_bitmap(button, (win->disp_data.width - al_get_bitmap_width(button)) * 0.5, win->disp_data.height * 0.6, 0);
+		al_draw_text(win->fonts->medium_font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.6 + 7, ALLEGRO_ALIGN_CENTER, "Play");
+
+		al_draw_bitmap(button, (win->disp_data.width - al_get_bitmap_width(button)) * 0.5, win->disp_data.height * 0.75, 0);
+		al_draw_text(win->fonts->medium_font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.75 + 7, ALLEGRO_ALIGN_CENTER, "Menu");
 		
 		al_flip_display();
 	}
@@ -242,21 +249,13 @@ void draw_gameover(window *win, game_t *game) {
 
 
 void graph_deinit(window win) {
-	printf("1\n");
 	al_destroy_timer(win.timer);
-	printf("2\n");
 	al_destroy_event_queue(win.event_queue);
-	printf("3\n");
 	al_destroy_display(win.display);
-	printf("4\n");
 
 	free(win.fonts->title_font);
-	printf("5\n");
 	free(win.fonts->medium_font);
-	printf("6\n");
 	free(win.fonts->small_font);
-	printf("7\n");
 	free(win.fonts);
-	printf("8\n");
 }
 

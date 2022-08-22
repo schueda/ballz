@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
 				menu_drew = true;	
 			}
 			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-				if(ev.mouse.x > win.disp_data.width/2 - 100 && ev.mouse.x < win.disp_data.width/2 + 100 && ev.mouse.y > win.disp_data.height/2 - 50 && ev.mouse.y < win.disp_data.height/2 + 50) {
+				if(ev.mouse.x > win.disp_data.width * 0.5 - 160 && ev.mouse.x < win.disp_data.width * 0.5 + 160 && ev.mouse.y > win.disp_data.height * 0.6 && ev.mouse.y < win.disp_data.height * 0.6 + 80) {
 					state = SETUP;
 					setup_game(&game, win.disp_data.width);
 					
@@ -317,7 +317,30 @@ int main(int argc, char *argv[]) {
 
 		case GAMEOVER:
 			if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-				state = MENU;
+				if (ev.mouse.x > win.disp_data.width * 0.5 - 160 && ev.mouse.x < win.disp_data.width * 0.5 + 160 && ev.mouse.y > win.disp_data.height * 0.6 && ev.mouse.y < win.disp_data.height * 0.6 + 80) {
+					state = SETUP;
+					setup_game(&game, win.disp_data.width);
+					
+					setup_squares(squares);
+
+					setup_bouncers(&bouncers, win.disp_data.width, game.shooting_y);
+
+					menu_drew = false;
+					can_shoot = false;
+					added_new_squares = false;
+					will_add_new_bouncers = false;
+
+					launch_interval = 0;
+					launch_index = 0;
+					arrival_counter = 0;
+					new_bouncers_count = 0;
+
+					offset=0;
+				}
+				if (ev.mouse.x > win.disp_data.width * 0.5 - 160 && ev.mouse.x < win.disp_data.width * 0.5 + 160 && ev.mouse.y > win.disp_data.height * 0.75 && ev.mouse.y < win.disp_data.height * 0.75 + 80) {
+					menu_drew = false;
+					state = MENU;
+				}
 			}
 			break;
 
