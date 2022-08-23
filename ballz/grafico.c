@@ -1,48 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "grafico.h"
+
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 
 window graph_init(int res_width, int res_height) {
-	int i;
-	window win = {NULL, NULL, NULL, {0, 0, 0, 0}, NULL};
+	window win = {NULL, NULL, NULL, {res_width, res_height, 0, 60}, NULL};
 
 	/* Inicializa a Allegro */
 	al_init();
 	al_init_image_addon();
 	al_init_native_dialog_addon();
 	al_init_font_addon();
+	al_init_primitives_addon();
 	al_init_ttf_addon();
 
-	/* Define Janela */
-	#ifdef __DEBUG__
-		puts("Modos display a 60Hz disponíveis:\n");
-	#endif
-
-	for (i = 0; i < al_get_num_display_modes(); ++i) {
-		al_get_display_mode(i, &win.disp_data);
-
-		if (win.disp_data.refresh_rate == 60) { // 60 Hz
-			#ifdef __DEBUG__
-				printf("(%d): %d %d\n", i, win.disp_data.width, win.disp_data.height);
-			#endif
-			if (win.disp_data.width == res_width && win.disp_data.height == res_height)
-				break;
-		}
-	}
-
-	#ifdef __DEBUG__
-		printf("\n\tModo selecionado --> (%d): %d %d\n", i, win.disp_data.width, win.disp_data.height);
-	#endif
-
-	al_get_display_mode(i, &win.disp_data);
-	al_set_new_display_flags(ALLEGRO_WINDOWED);
-	win.display = al_create_display(600,800/*win.disp_data.width, win.disp_data.height*/);
-	win.disp_data.width = 600; //HARDCODED
-	win.disp_data.height = 800;//HARDCODED
+	win.display = al_create_display(res_width, res_height);
 
 	al_install_mouse();
 	al_install_keyboard();
@@ -61,7 +40,7 @@ window graph_init(int res_width, int res_height) {
 	al_start_timer(win.timer);
 
 	char *font_path = al_get_current_directory();
-	strcat(font_path, "/dimitri/dimitri.ttf");
+	strcat(font_path, "/resources/dimitri/dimitri.ttf");
 	char *safe_font_path = malloc(strlen(font_path) + 1);
 	strcpy(safe_font_path, font_path);
 
@@ -103,7 +82,7 @@ void draw_menu(window *win) {
 
 	al_draw_text(win->fonts->title_font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.2, ALLEGRO_ALIGN_CENTER, "BALLz");
 	
-	ALLEGRO_BITMAP *button = al_load_bitmap("button.png");
+	ALLEGRO_BITMAP *button = al_load_bitmap("resources/button.png");
 	al_draw_bitmap(button, (win->disp_data.width - al_get_bitmap_width(button)) * 0.5, win->disp_data.height * 0.6, 0);
 
 	al_draw_text(win->fonts->medium_font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.6 + 7, ALLEGRO_ALIGN_CENTER, "Play");
