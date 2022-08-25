@@ -215,7 +215,7 @@ void draw_gameover(window *win, game_t *game) {
 			al_draw_text(win->fonts->small_font, VERDE_CLARO, win->disp_data.width * 0.5, win->disp_data.height * 0.5, ALLEGRO_ALIGN_CENTRE, "New Highscore!");
 		}
 
-		ALLEGRO_BITMAP *button = al_load_bitmap("button.png");
+		ALLEGRO_BITMAP *button = al_load_bitmap("resources/button.png");
 		al_draw_bitmap(button, (win->disp_data.width - al_get_bitmap_width(button)) * 0.5, win->disp_data.height * 0.6, 0);
 		al_draw_text(win->fonts->medium_font, BRANCO, win->disp_data.width * 0.5, win->disp_data.height * 0.6 + 7, ALLEGRO_ALIGN_CENTER, "Play");
 

@@ -24,6 +24,7 @@ int main(int argc, char *argv[]) {
 
 	int i,j;
 
+	bool sair = false;
 	bool menu_drew = false;
 	bool can_shoot = false;
 	bool added_new_squares = false;
@@ -58,7 +59,7 @@ int main(int argc, char *argv[]) {
 
 	
 
-	while (1) {
+	while (!sair) {
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(win.event_queue, &ev);
 
@@ -194,7 +195,6 @@ int main(int argc, char *argv[]) {
 
 					for (i=game.bouncers - new_bouncers_count; i<game.bouncers; i++) {
 						bouncers[i] = createBouncer(game.shooting_x, game.shooting_y);
-						printf("bouncers[%d] = %p\n", i, bouncers[i]);
 					}
 
 					new_bouncers_count = 0;
@@ -348,7 +348,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-			break;
+			sair = true;
 		} 
 	}
 
