@@ -79,8 +79,13 @@ void setup_bouncers(bouncer_t ***bouncers, float dispWidth, float shooting_y) {
 }
 
 void destroy_bouncers(bouncer_t **bouncers, game_t *game) {
-	for(int i = 0; i < game->bouncers; ++i) {
-		free(bouncers[i]);
+	if(bouncers != NULL) {
+		for(int i = 0; i < game->bouncers; ++i) {
+			if(bouncers[i] != NULL) {
+				free(bouncers[i]);
+			}
+		}
+		free(bouncers);
 	}
-	free(bouncers);
+	
 }

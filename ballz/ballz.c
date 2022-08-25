@@ -349,6 +349,7 @@ int main(int argc, char *argv[]) {
 
 		if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			sair = true;
+			destroy_bouncers(bouncers, &game);
 		} 
 	}
 

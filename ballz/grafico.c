@@ -39,39 +39,32 @@ window graph_init(int res_width, int res_height) {
 	al_flip_display();
 	al_start_timer(win.timer);
 
-	char *font_path = al_get_current_directory();
-	strcat(font_path, "/resources/dimitri/dimitri.ttf");
-	char *safe_font_path = malloc(strlen(font_path) + 1);
-	strcpy(safe_font_path, font_path);
+	char font_path[100];
+	sprintf(font_path, "%s/resources/dimitri/dimitri.ttf", al_get_current_directory());
+	printf("font_path: %s\n", font_path);
 
-	printf("safe_font_path: %s\n", safe_font_path);
 
 	fonts_t *fonts = malloc(sizeof(fonts_t));
-	printf("fonts: %p\n", fonts);
 
 	printf("loading title font\n");
-	printf("safe_font_path: %s\n", safe_font_path);
-	fonts->title_font = al_load_ttf_font(safe_font_path, 100, 0);
+	
+	fonts->title_font = al_load_font(font_path, 100, 0);
 	printf("fonts->title_font: %p\n", fonts->title_font);
 
 	printf("loading big font\n");
-	printf("safe_font_path: %s\n", safe_font_path);
-	fonts->big_font = al_load_ttf_font(safe_font_path, 70, 0);
+	fonts->big_font = al_load_font(font_path, 70, 0);
 	printf("fonts->big_font: %p\n", fonts->big_font);
 
 
 	printf("loading medium font\n");
-	printf("safe_font_path: %s\n", safe_font_path);
-	fonts->medium_font = al_load_ttf_font(safe_font_path, 50, 0);
+	fonts->medium_font = al_load_font(font_path, 50, 0);
 	printf("fonts->medium_font: %p\n", fonts->medium_font);
 
 	printf("loading small font\n");
-	printf("safe_font_path: %s\n", safe_font_path);
-	fonts->small_font = al_load_ttf_font(safe_font_path, 30, 0);
+	fonts->small_font = al_load_font(font_path, 30, 0);
 	printf("fonts->small_font: %p\n", fonts->small_font);
 
 	win.fonts = fonts;
-	printf("win.fonts: %p\n", win.fonts);
 	printf("====================================================\n");
 
 	return (win);
@@ -232,9 +225,9 @@ void graph_deinit(window win) {
 	al_destroy_event_queue(win.event_queue);
 	al_destroy_display(win.display);
 
-	free(win.fonts->title_font);
-	free(win.fonts->medium_font);
-	free(win.fonts->small_font);
+	al_destroy_font(win.fonts->title_font);
+	al_destroy_font(win.fonts->medium_font);
+	al_destroy_font(win.fonts->small_font);
 	free(win.fonts);
 }
 
