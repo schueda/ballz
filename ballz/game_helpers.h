@@ -1,10 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef __HELPER__
+#define __HELPER__
 
 #define BOUNCER_RADIUS 12
-
 #define SPEED_FACTOR 20
-
 #define MOUSE_SENSIBILITY 2
 
 #define LINHAS_QUADRADO 8
@@ -48,3 +46,5 @@ void setup_game(game_t *game, float dispWidth);
 void setup_squares(int squares[][COLUNAS_QUADRADO]);
 void setup_bouncers(bouncer_t ***bouncers, float dispWidth, float shooting_y);
 void destroy_bouncers(bouncer_t **bouncers, game_t *game);
+
+#endif
